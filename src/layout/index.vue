@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { ref, watch } from 'vue'
 
 const route = useRoute()
+const router = useRouter()
+
+// 退出登录
+const logout = () => {
+  router.push('/login')
+}
 
 const currentPath = ref('all')
 watch(
@@ -21,7 +27,29 @@ watch(
           <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
           <span>简存取云盘</span>
         </div>
-        <div></div>
+        <div class="user-info">
+          <el-dropdown>
+            <div style="display: flex; align-items: center; height: 50px">
+              <el-avatar
+                :size="45"
+                src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+              />
+              <div class="user-info-right-wrap">
+                <span class="user-name">大橘子#0204</span>
+                <el-progress :percentage="50" color="#0d53ff" :show-text="false"> </el-progress>
+                <span class="user-space"><span>500</span>M / 1G</span>
+              </div>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="logout">退出登录</div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
       <el-container>
         <el-aside class="layout-navbar">
@@ -93,6 +121,38 @@ watch(
     padding-left: 25px;
     font-size: 24px;
     font-weight: 600;
+  }
+  .user-info {
+    height: 50px;
+    margin: 0 10px 0 auto;
+    .user-info-right-wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      margin-left: 12px;
+      .user-name {
+        width: 100px;
+        font-size: 13px;
+        color: #222222;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      :deep(.el-progress-bar__outer) {
+        background-color: rgba(16%, 16%, 100%, 0.1);
+      }
+      .user-space {
+        font-size: 11px;
+        color: #52565e;
+        font-weight: 600;
+      }
+    }
+    :deep(.el-tooltip__trigger:focus-visible) {
+      outline: unset;
+    }
   }
 }
 .layout-navbar {
