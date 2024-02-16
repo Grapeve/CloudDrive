@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -66,6 +67,28 @@ const renameFolderNameFn = () => {
   fileList.value[renameNo.value!].fileName = fileRenameName.value
   fileRenameName.value = ''
   renameNo.value = null
+}
+
+// 文件删除
+const fileDelete = (index: number) => {
+  ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      fileStore.fileDelete(index)
+      ElMessage({
+        type: 'success',
+        message: '删除成功'
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '删除取消'
+      })
+    })
 }
 
 // 鼠标悬浮至文件时展示文件相关操作
@@ -147,7 +170,7 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
             </el-button>
           </el-tooltip>
           <el-tooltip content="删除" placement="top" effect="light">
-            <el-button circle color="#ff430f">
+            <el-button circle color="#ff430f" @click="fileDelete(scope.$index)">
               <el-icon :size="18"><Delete /></el-icon>
             </el-button>
           </el-tooltip>

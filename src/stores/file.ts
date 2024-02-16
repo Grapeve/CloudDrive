@@ -17,5 +17,9 @@ export const useFileStore = defineStore('file', () => {
     }
   ])
 
-  return { fileList }
+  function fileDelete(index: number) {
+    fileList.value.splice(index, 1)
+  }
+
+  return { fileList, fileDelete }
 })
