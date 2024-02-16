@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { RouterView, useRoute, useRouter } from 'vue-router'
 import { ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+import { useBreadcrumbStore } from '@/stores/breadcrumb'
 
 const route = useRoute()
 const router = useRouter()
+
+const breadcrumbStore = useBreadcrumbStore()
 
 // 退出登录
 const logout = () => {
@@ -15,6 +18,7 @@ watch(
   () => route.path,
   (val) => {
     currentPath.value = val.slice(1)
+    breadcrumbStore.clearBreadcrumb()
   }
 )
 </script>

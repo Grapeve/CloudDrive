@@ -4,8 +4,10 @@ import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { useFileStore } from '@/stores/file'
+import { useBreadcrumbStore } from '@/stores/breadcrumb'
 
 const fileStore = useFileStore()
+const breadcrumbStore = useBreadcrumbStore()
 
 const tableHeight = ref(window.innerHeight - 200)
 const { fileList } = storeToRefs(fileStore)
@@ -25,6 +27,25 @@ const createFolder = () => {
     type: 'folder'
   }
   createFolderDebounceFn()
+}
+
+// 进入文件夹
+const goToFolder = (file: any) => {
+  if (file.type === 'folder') {
+    breadcrumbStore.addBreadcrumb({
+      id: '123456789',
+      name: file.fileName
+    })
+    // TODO:调接口获取该文件夹的子文件
+    fileList.value = [
+      {
+        fileName: '壁纸1',
+        fileSize: '-',
+        fileChangeDate: '2024-02-09 00:00:00',
+        type: 'docx'
+      }
+    ]
+  }
 }
 
 // 多选
@@ -93,7 +114,9 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
             v-else-if="scope.row.type === 'docx'"
           />
           <div style="margin-left: 10px; cursor: pointer">
-            <span v-if="scope.$index !== renameNo">{{ scope.row.fileName }} </span>
+            <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
+              >{{ scope.row.fileName }}
+            </span>
             <el-input
               v-else
               v-model="fileRenameName"
