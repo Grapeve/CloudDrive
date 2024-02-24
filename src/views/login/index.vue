@@ -2,16 +2,14 @@
 import { ref } from 'vue'
 
 const loginForm = ref({
-  username: "",
-  password: "",
-  isMaintain: false,
-}) as object
+  username: '',
+  password: '',
+  isMaintain: false
+})
 
-function loginSubmit(){
+function loginSubmit() {
   console.log(loginForm)
 }
-
-
 </script>
 
 <template>
@@ -21,10 +19,10 @@ function loginSubmit(){
         <el-input v-model="loginForm.username" />
       </el-form-item>
       <el-form-item label="密码：">
-        <el-input v-model="loginForm.password" show-password/>
+        <el-input v-model="loginForm.password" show-password />
       </el-form-item>
       <el-form-item label="保持登录：">
-        <el-checkbox v-model="loginForm.isMaintain"/>
+        <el-checkbox v-model="loginForm.isMaintain" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="loginSubmit">登录</el-button>
@@ -34,7 +32,6 @@ function loginSubmit(){
 </template>
 
 <style scoped>
-
 .login {
   width: 50vh;
   height: 50vh;

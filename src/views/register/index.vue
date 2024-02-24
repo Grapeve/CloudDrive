@@ -9,9 +9,9 @@ const regForm = ref({
   phone: '',
   email: '',
   code: ''
-}) as object
+})
 
-const password_check = ref('') as string
+const password_check = ref('')
 
 function regSubmit() {
   console.log(regForm.value)
