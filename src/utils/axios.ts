@@ -1,44 +1,35 @@
 import axios from 'axios'
-import {localGet, localRemove} from './localStorageFn'
+import { localGet } from './localStorageFn'
 
 const server = axios.create({
-    baseURL: '',
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        token: localGet('token') || '',
-        post: {
-            'Content-Type': 'application/jsona'
-        }
-    }
+  baseURL: 'http://120.79.155.59:9096',
+  headers: {
+    'X-Requested-With': 'XMLHttpRequest',
+    token: localGet('token') || ''
+    // post: {
+    //     'Content-Type': 'application/jsona'
+    // }
+  }
 })
 
 // 请求拦截器，后续有需要再添加
-server.interceptors.request.use(
-    res => {
-        if (localGet('token')) { //判断token是否存在
-            res.headers.token = localGet('token');  //将token设置成请求头
-        }
-        return res;
-    },
-    err => {
-        return Promise.reject(err);
-    }
-)
+server.interceptors.request.use()
 
 // 响应拦截器，后续有需要再添加
-server.interceptors.response.use(
-    response => {
-        if (response.data.code === 999) {
-            localRemove("token");
-            // router.replace('/');
-            console.log("token过期");
-        }
-        return response;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
+server.interceptors.response
+  .use
+  // response => {
+  //     if (response.data.code === 999) {
+  //         localRemove("token");
+  //         // router.replace('/');
+  //         console.log("token过期");
+  //     }
+  //     return response;
+  // },
+  // error => {
+  //     return Promise.reject(error);
+  // }
+  ()
 
 export default server
 
