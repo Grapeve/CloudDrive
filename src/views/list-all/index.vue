@@ -42,12 +42,21 @@ const goToThis = (fileId: string) => {}
 // 首次加载页面时获取所有文件并存入store中
 onBeforeMount(() => {
   // TODO: 调接口获取文件列表
+<<<<<<< HEAD
+  server
+    .post('/folder/getFolder', { folderId: -1 })
+    .then((res) => {
+      if (res.data.success) {
+        fileList.value = [...res.data.data.folders, ...res.data.data.files]
+      } else {
+=======
   server.post('/folder/getFolder', {"folderId": -1})
   .then(res => {
     if (res.data.success) {
       fileList.value = [...res.data.data.folders, ...res.data.data.files]
     }
     else {
+>>>>>>> 3755c5b69c77d6aac4f9928c70aa87b7c51b43c2
         ElNotification({
           title: '获取文件列表失败！',
           message: res.data.msg,
