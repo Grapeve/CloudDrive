@@ -20,6 +20,7 @@ function loginSubmit() {
           type: 'success'
         })
         localSet('token', response.data.data.token)
+        localSet('user', response.data.data.user)
         console.log(localGet('token'))
         // TODO: 成功返回主页面
       } else {

@@ -12,6 +12,14 @@ const router = createRouter({
       component: () => import('@/views/register/index.vue')
     },
     {
+      path: '/changepwd',
+      component: () => import('@/views/user-center/change-password.vue')
+    },
+    {
+      path: '/changeinfo',
+      component: () => import('@/views/user-center/change-user-info.vue')
+    },
+    {
       path: '/',
       component: () => import('@/layout/index.vue'),
       redirect: '/all',
