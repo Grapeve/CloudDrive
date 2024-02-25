@@ -121,7 +121,7 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
     @selection-change="handleSelectionChange"
   >
     <el-table-column type="selection" width="35" />
-    <el-table-column prop="fileName" label="文件名" min-width="780">
+    <el-table-column prop="name" label="文件名" min-width="780">
       <template #default="scope">
         <div style="display: flex; align-items: center">
           <img
@@ -136,9 +136,15 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
             height="32"
             v-else-if="scope.row.type === 'docx'"
           />
+          <!-- <img
+              src="/src/assets/imgs/docx.png"
+              width="32"
+              height="32"
+              v-else
+            /> -->
           <div style="margin-left: 10px; cursor: pointer">
             <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
-              >{{ scope.row.fileName }}
+              >{{ scope.row.name }}
             </span>
             <el-input
               v-else
@@ -177,8 +183,8 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="fileSize" label="大小" min-width="180" />
-    <el-table-column prop="fileChangeDate" label="修改日期" min-width="200" />
+    <el-table-column prop="size" label="大小" min-width="180" />
+    <el-table-column prop="update_time" label="修改日期" min-width="200" />
   </el-table>
 </template>
 

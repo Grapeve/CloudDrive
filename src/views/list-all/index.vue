@@ -8,6 +8,8 @@ import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ArrowRight } from '@element-plus/icons-vue'
 
 import FileTable from '@/components/FileTable/index.vue'
+import server from '@/utils/axios'
+import { ElNotification } from 'element-plus'
 
 const fileStore = useFileStore()
 const { fileList } = storeToRefs(fileStore)
@@ -40,20 +42,37 @@ const goToThis = (fileId: string) => {}
 // 首次加载页面时获取所有文件并存入store中
 onBeforeMount(() => {
   // TODO: 调接口获取文件列表
-  fileList.value = [
-    {
-      fileName: '精选壁纸2',
-      fileSize: '-',
-      fileChangeDate: '2024-02-09 00:00:00',
-      type: 'folder'
-    },
-    {
-      fileName: '需求说明书.docx',
-      fileSize: '12KB',
-      fileChangeDate: '2024-02-09 1:00:00',
-      type: 'docx'
-    }
-  ]
+  server
+    .post('/folder/getFolder', { folderId: -1 })
+    .then((res) => {
+      if (res.data.success) {
+        fileList.value = [...res.data.data.folders, ...res.data.data.files]
+      } else {
+        ElNotification({
+          title: '获取文件列表失败！',
+          message: res.data.msg,
+          type: 'error'
+        })
+      }
+    })
+    .catch((error) => {
+      // 处理错误
+      console.error('发生错误:', error)
+    })
+  // fileList.value = [
+  //   {
+  //     fileName: '精选壁纸2',
+  //     fileSize: '-',
+  //     fileChangeDate: '2024-02-09 00:00:00',
+  //     type: 'folder'
+  //   },
+  //   {
+  //     fileName: '需求说明书.docx',
+  //     fileSize: '12KB',
+  //     fileChangeDate: '2024-02-09 1:00:00',
+  //     type: 'docx'
+  //   }
+  // ]
 })
 </script>
 
