@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios'
 import { localGet } from './localStorageFn'
 
 const server = axios.create({
