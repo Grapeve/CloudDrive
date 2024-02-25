@@ -35,7 +35,7 @@ import { onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import server from '@/utils/axios'
 import { localSet, localGet } from '@/utils/localStorageFn'
-import { User } from '@element-plus/icons-vue'
+import router from '@/router'
 
 const changeinfo = ref({
   username: '',
@@ -68,6 +68,7 @@ function changeSubmit() {
         user.phone = changeinfo.value.phone
         user.email = changeinfo.value.email
         localSet('user', user)
+        router.push('/')
       } else {
         ElNotification({
           title: '错误',

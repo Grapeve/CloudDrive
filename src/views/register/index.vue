@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import server from '@/utils/axios'
+import router from '@/router'
 
 const regForm = ref({
   username: '',
@@ -26,7 +27,7 @@ function regSubmit() {
             message: '现在返登录页面',
             type: 'success'
           })
-          // TODO: 注册成功返回登陆页面
+          router.push('/login')
         } else {
           ElNotification({
             title: '错误',

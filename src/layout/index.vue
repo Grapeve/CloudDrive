@@ -1,16 +1,71 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import { localGet, localRemove } from '@/utils/localStorageFn'
+import server from '@/utils/axios'
+import { ElNotification } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
 
 const breadcrumbStore = useBreadcrumbStore()
 
+const user = localGet('user')
+
+const usage = ref(0.0)
+
+// 获取已使用的空间
+onMounted(() => {
+  server
+    .get('/file/usingMemory')
+    .then((res) => {
+      if (res.data.success) {
+        usage.value = res.data.data.toFixed(2)
+      } else {
+        ElNotification({
+          title: '错误',
+          message: res.data.msg,
+          type: 'error'
+        })
+      }
+    })
+    .catch((error) => {
+      // 处理错误
+      console.error('发生错误:', error)
+    })
+})
+
+// 注册
+const register = () => {
+  router.push('/register')
+}
+
+// 登录
+const login = () => {
+  router.push('/login')
+}
+
 // 退出登录
 const logout = () => {
+  localRemove('user')
+  localRemove('token')
   router.push('/login')
+}
+
+// 改头像
+const updateAvatar = () => {
+  router.push('/')
+}
+
+// 改密码
+const changePwd = () => {
+  router.push('/changepwd')
+}
+
+// 改个人信息
+const changeInfo = () => {
+  router.push('/changeinfo')
 }
 
 const currentPath = ref('all')
@@ -31,28 +86,44 @@ watch(
           <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
           <span>简存取云盘</span>
         </div>
-        <div class="user-info">
+        <div class="user-info" v-if="user">
           <el-dropdown>
             <div style="display: flex; align-items: center; height: 50px">
-              <el-avatar
+              <!-- <el-avatar
                 :size="45"
                 src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
-              />
+              /> -->
+              <el-avatar :size="45" :src="user.avatar" />
               <div class="user-info-right-wrap">
-                <span class="user-name">大橘子#0204</span>
-                <el-progress :percentage="50" color="#0d53ff" :show-text="false"> </el-progress>
-                <span class="user-space"><span>500</span>M / 1G</span>
+                <span class="user-name">{{ user.username }}</span>
+                <el-progress :percentage="usage / 10.24" color="#0d53ff" :show-text="false" />
+                <span class="user-space"
+                  ><span>{{ usage }}</span
+                  >M / 1G</span
+                >
               </div>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="changeInfo">修改个人信息</div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="updateAvatar">更新头像</div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="changePwd">修改密码</div>
+                </el-dropdown-item>
                 <el-dropdown-item>
                   <div @click="logout">退出登录</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+        </div>
+        <div class="user-info" v-else>
+          <el-button type="primary" @click="login">登录</el-button>
+          <el-button type="primary" @click="register">注册</el-button>
         </div>
       </el-header>
       <el-container>

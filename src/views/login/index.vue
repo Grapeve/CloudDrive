@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import server from '@/utils/axios'
 import { localSet, localGet } from '@/utils/localStorageFn'
+import router from '@/router'
 
 const loginForm = ref({
   username: '',
@@ -22,7 +23,7 @@ function loginSubmit() {
         localSet('token', response.data.data.token)
         localSet('user', response.data.data.user)
         console.log(localGet('token'))
-        // TODO: 成功返回主页面
+        router.push('/')
       } else {
         ElNotification({
           title: '错误',
@@ -47,9 +48,6 @@ function loginSubmit() {
       <el-form-item label="密码：">
         <el-input v-model="loginForm.password" show-password />
       </el-form-item>
-      <!-- <el-form-item label="保持登录：">
-        <el-checkbox v-model="loginForm.isMaintain" />
-      </el-form-item> -->
       <el-form-item>
         <el-button type="primary" @click="loginSubmit">登录</el-button>
       </el-form-item>
