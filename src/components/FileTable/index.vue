@@ -7,28 +7,13 @@ import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
+import { renameFileApi, renameFolderApi } from '@/api/fileApi'
+
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 
 const tableHeight = ref(window.innerHeight - 200)
 const { fileList } = storeToRefs(fileStore)
-
-// 创建文件夹
-let folderInfo = {} as any
-const createFolderDebounceFn = useDebounceFn(() => {
-  fileList.value.unshift(folderInfo)
-  folderInfo = {}
-}, 500)
-const createFolder = () => {
-  const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
-  folderInfo = {
-    fileName: '精选壁纸-' + currentTime,
-    fileSize: '-',
-    fileChangeDate: currentTime,
-    type: 'folder'
-  }
-  createFolderDebounceFn()
-}
 
 // 进入文件夹
 const goToFolder = (file: any) => {
@@ -38,14 +23,14 @@ const goToFolder = (file: any) => {
       name: file.fileName
     })
     // TODO:调接口获取该文件夹的子文件
-    fileList.value = [
-      {
-        fileName: '壁纸1',
-        fileSize: '-',
-        fileChangeDate: '2024-02-09 00:00:00',
-        type: 'docx'
-      }
-    ]
+    // fileList.value = [
+    //   {
+    //     fileName: '壁纸1',
+    //     fileSize: '-',
+    //     fileChangeDate: '2024-02-09 00:00:00',
+    //     type: 'docx'
+    //   }
+    // ]
   }
 }
 
@@ -60,11 +45,46 @@ const handleSelectionChange = (val: any) => {
 let fileRenameName = ref<string>('')
 let renameNo = ref<number | null>(null)
 const fileRenameFn = (index: number) => {
-  fileRenameName.value = fileList.value[index].fileName
+  fileRenameName.value = fileList.value[index].name
   renameNo.value = index
 }
-const renameFolderNameFn = () => {
-  fileList.value[renameNo.value!].fileName = fileRenameName.value
+const renameFolderNameFn = async () => {
+  try {
+    if (fileList.value[renameNo.value!].type === 'folder') {
+      const { data } = await renameFolderApi(
+        fileList.value[renameNo.value!].id,
+        fileRenameName.value
+      )
+      if (data.success === true) {
+        ElMessage({
+          type: 'success',
+          message: data.msg
+        })
+      } else {
+        ElMessage({
+          type: 'error',
+          message: data.msg
+        })
+      }
+    } else {
+      const { data } = await renameFileApi(fileList.value[renameNo.value!].id, fileRenameName.value)
+      if (data.success === true) {
+        ElMessage({
+          type: 'success',
+          message: data.msg
+        })
+      } else {
+        ElMessage({
+          type: 'error',
+          message: data.msg
+        })
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+
+  fileList.value[renameNo.value!].name = fileRenameName.value
   fileRenameName.value = ''
   renameNo.value = null
 }
@@ -136,12 +156,13 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
             height="32"
             v-else-if="scope.row.type === 'docx'"
           />
-          <!-- <img
-              src="/src/assets/imgs/docx.png"
-              width="32"
-              height="32"
-              v-else
-            /> -->
+          <img :src="scope.row.url" width="32" height="32" v-else-if="scope.row.type === 'img'" />
+          <img
+            src="/src/assets/imgs/music.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.type === 'music'"
+          />
           <div style="margin-left: 10px; cursor: pointer">
             <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
               >{{ scope.row.name }}
@@ -183,7 +204,13 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="size" label="大小" min-width="180" />
+    <el-table-column prop="size" label="大小" min-width="180">
+      <template #default="scope">
+        <span v-if="scope.row.type === 'folder'">-</span>
+        <!-- TODO:文件大小输出格式化 -->
+        <span v-else>{{ scope.row.size }}</span>
+      </template>
+    </el-table-column>
     <el-table-column prop="update_time" label="修改日期" min-width="200" />
   </el-table>
 </template>
@@ -202,3 +229,4 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
   display: inline-block !important;
 }
 </style>
+@/api/fileApi
