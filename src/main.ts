@@ -12,6 +12,9 @@ import SvgIcon from '@/components/SvgIcon/index.vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 
+// 导入路由鉴权
+import './permission'
+
 const app = createApp(App)
 
 app.use(createPinia())

@@ -86,7 +86,7 @@ watch(
           <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
           <span>简存取云盘</span>
         </div>
-        <div class="user-info" v-if="user">
+        <div class="user-info">
           <el-dropdown>
             <div style="display: flex; align-items: center; height: 50px">
               <!-- <el-avatar
@@ -120,10 +120,6 @@ watch(
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-        </div>
-        <div class="user-info" v-else>
-          <el-button type="primary" @click="login">登录</el-button>
-          <el-button type="primary" @click="register">注册</el-button>
         </div>
       </el-header>
       <el-container>
