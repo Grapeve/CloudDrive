@@ -14,6 +14,7 @@ import {
   deleteFolderApi,
   deleteFileApi
 } from '@/api/fileApi'
+import { convertSize } from '@/utils/index'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -309,7 +310,7 @@ defineExpose({
       <template #default="scope">
         <span v-if="scope.row.type === 'folder'">-</span>
         <!-- TODO:文件大小输出格式化 -->
-        <span v-else>{{ scope.row.size }}</span>
+        <span v-else>{{ convertSize(scope.row.size) }}</span>
       </template>
     </el-table-column>
     <el-table-column prop="update_time" label="修改日期" min-width="200" />
