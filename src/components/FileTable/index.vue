@@ -231,11 +231,34 @@ function shareConfirm() {}
           />
           <img :src="scope.row.url" width="32" height="32" v-else-if="scope.row.type === 'img'" />
           <img
+            src="/src/assets/imgs/pdf.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('pdf')"
+          />
+          <img
             src="/src/assets/imgs/music.png"
             width="32"
             height="32"
             v-else-if="scope.row.type === 'music'"
           />
+          <img
+            src="/src/assets/imgs/video.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.type === 'video'"
+          />
+          <img
+            src="/src/assets/imgs/excel.png"
+            width="32"
+            height="32"
+            v-else-if="
+              scope.row.mime_type.includes(
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              )
+            "
+          />
+          <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
           <div style="margin-left: 10px; cursor: pointer">
             <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
               >{{ scope.row.name }}
