@@ -3,13 +3,14 @@ import { ref, onBeforeMount } from 'vue'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { useFileStore } from '@/stores/file'
-import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ArrowRight } from '@element-plus/icons-vue'
+import { ElMessage, ElNotification } from 'element-plus'
+import server from '@/utils/axios'
 
 import FileTable from '@/components/FileTable/index.vue'
-import server from '@/utils/axios'
-import { ElNotification } from 'element-plus'
+import { useFileStore, type folderType } from '@/stores/file'
+import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import { createFolderApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
 const { fileList } = storeToRefs(fileStore)
@@ -18,19 +19,33 @@ const breadcrumbStore = useBreadcrumbStore()
 const { breadCrumbs } = storeToRefs(breadcrumbStore)
 
 // 创建文件夹
-let folderInfo = {} as any
-const createFolderDebounceFn = useDebounceFn(() => {
-  fileList.value.unshift(folderInfo)
-  folderInfo = {}
+let createFoldername: string = ''
+const createFolderDebounceFn = useDebounceFn(async () => {
+  try {
+    const { data } = await createFolderApi(createFoldername, -1)
+    if (data.success === true) {
+      fileList.value.unshift({ ...data.data, type: 'folder' })
+      ElMessage({
+        type: 'success',
+        message: data.msg
+      })
+    } else {
+      ElMessage({
+        type: 'error',
+        message: data.msg
+      })
+    }
+  } catch (error: any) {
+    ElMessage({
+      type: 'error',
+      message: error.message
+    })
+  }
+  createFoldername = ''
 }, 500)
 const createFolder = () => {
   const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
-  folderInfo = {
-    fileName: '精选壁纸-' + currentTime,
-    fileSize: '-',
-    fileChangeDate: currentTime,
-    type: 'folder'
-  }
+  createFoldername = '新建文件夹-' + currentTime
   createFolderDebounceFn()
 }
 
@@ -59,20 +74,6 @@ onBeforeMount(() => {
       // 处理错误
       console.error('发生错误:', error)
     })
-  // fileList.value = [
-  //   {
-  //     fileName: '精选壁纸2',
-  //     fileSize: '-',
-  //     fileChangeDate: '2024-02-09 00:00:00',
-  //     type: 'folder'
-  //   },
-  //   {
-  //     fileName: '需求说明书.docx',
-  //     fileSize: '12KB',
-  //     fileChangeDate: '2024-02-09 1:00:00',
-  //     type: 'docx'
-  //   }
-  // ]
 })
 </script>
 
@@ -159,3 +160,4 @@ onBeforeMount(() => {
   }
 }
 </style>
+@/api/fileApi
