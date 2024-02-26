@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
+import { ref, onBeforeMount, onMounted } from 'vue'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -18,6 +18,12 @@ const { fileList } = storeToRefs(fileStore)
 const breadcrumbStore = useBreadcrumbStore()
 const { breadCrumbs } = storeToRefs(breadcrumbStore)
 
+// 文件列表子组件实例
+interface FileTableRef {
+  fileRenameFn: (index: number) => void
+}
+const fileTableRef = ref<FileTableRef | null>(null)
+
 // 创建文件夹
 let createFoldername: string = ''
 const createFolderDebounceFn = useDebounceFn(async () => {
@@ -25,9 +31,10 @@ const createFolderDebounceFn = useDebounceFn(async () => {
     const { data } = await createFolderApi(createFoldername, -1)
     if (data.success === true) {
       fileList.value.unshift({ ...data.data, type: 'folder' })
+      fileTableRef.value!.fileRenameFn(0)
       ElMessage({
         type: 'success',
-        message: data.msg
+        message: '创建文件夹成功'
       })
     } else {
       ElMessage({
@@ -132,7 +139,7 @@ onBeforeMount(() => {
       </div>
     </div>
     <!-- 文件列表 -->
-    <FileTable />
+    <FileTable ref="fileTableRef" />
   </div>
 </template>
 

@@ -200,6 +200,11 @@ function shareStart(id: any) {
 }
 
 function shareConfirm() {}
+
+// 向外暴露修改文件夹名方法，使创建文件夹时触发修改文件夹名
+defineExpose({
+  fileRenameFn
+})
 </script>
 
 <template>
