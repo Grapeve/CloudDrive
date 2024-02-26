@@ -128,6 +128,23 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
     btnsDiv.style.display = 'none'
   }
 }
+
+// 分享相关
+const shareVisible = ref(false)
+const isProtected = ref(false)
+const shareInfo = ref({
+  fileIds: [-1],
+  folderIds: [-1],
+  shareCode: '',
+  expireTime: '',
+  description: ''
+})
+
+function shareStart(id: any) {
+  console.log(id)
+}
+
+function shareConfirm() {}
 </script>
 
 <template>
@@ -188,7 +205,7 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
             </el-button>
           </el-tooltip>
           <el-tooltip content="分享" placement="top" effect="light">
-            <el-button circle color="#ff0fcb">
+            <el-button circle color="#ff0fcb" @click="shareStart(scope.$index)">
               <el-icon :size="18"><Share /></el-icon>
             </el-button>
           </el-tooltip>
@@ -214,6 +231,27 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
     </el-table-column>
     <el-table-column prop="update_time" label="修改日期" min-width="200" />
   </el-table>
+  <!-- 分享Dialog -->
+  <el-dialog v-model="shareVisible" title="Shipping address" width="500">
+    <el-form :model="shareInfo">
+      <el-form-item label="分享描述">
+        <el-input v-model="shareInfo.description" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="分享有效期">
+        <el-input v-model="shareInfo.expireTime" />
+      </el-form-item>
+      <el-form-item label="需要提取码">
+        <el-checkbox v-model="isProtected"></el-checkbox>
+      </el-form-item>
+      <el-form-item label="提取码">
+        <el-input v-model="shareInfo.shareCode" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <div class="dialog-footer">
+      <el-button @click="shareVisible = false">取消</el-button>
+      <el-button type="primary" @click="shareConfirm"> 确认分享 </el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <style lang="less" scoped>
