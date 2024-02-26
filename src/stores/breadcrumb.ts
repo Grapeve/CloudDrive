@@ -16,7 +16,7 @@ export const useBreadcrumbStore = defineStore('breadcrumb', () => {
   function deleteBreadcrumb(id: string) {
     const index = breadCrumbs.value.findIndex((breadCrumb) => breadCrumb?.id === id)
     if (index !== -1) {
-      breadCrumbs.value.reverse().splice(0, index + 1)
+      breadCrumbs.value = breadCrumbs.value.slice(0, index + 1)
     }
   }
 

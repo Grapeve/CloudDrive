@@ -28,7 +28,11 @@ const fileTableRef = ref<FileTableRef | null>(null)
 let createFoldername: string = ''
 const createFolderDebounceFn = useDebounceFn(async () => {
   try {
-    const { data } = await createFolderApi(createFoldername, -1)
+    let parentId = -1
+    if (breadCrumbs.value.length > 0) {
+      parentId = Number(breadCrumbs.value[breadCrumbs.value.length - 1].id)
+    }
+    const { data } = await createFolderApi(createFoldername, parentId)
     if (data.success === true) {
       fileList.value.unshift({ ...data.data, type: 'folder' })
       fileTableRef.value!.fileRenameFn(0)
@@ -71,15 +75,17 @@ const goToAllFile = async () => {
 }
 // 点击面包屑返回对应的文件夹列表
 const goToThis = async (fileId: string) => {
-  const { data } = await getFolderApi(Number(fileId), '')
-  if (data.success === true) {
-    fileList.value = [...data.data.folders, ...data.data.files]
-    breadcrumbStore.deleteBreadcrumb(fileId)
-  } else {
-    ElMessage({
-      type: 'error',
-      message: data.msg
-    })
+  if (breadCrumbs.value[breadCrumbs.value.length - 1].id !== fileId) {
+    const { data } = await getFolderApi(Number(fileId), '')
+    if (data.success === true) {
+      fileList.value = [...data.data.folders, ...data.data.files]
+      breadcrumbStore.deleteBreadcrumb(fileId)
+    } else {
+      ElMessage({
+        type: 'error',
+        message: data.msg
+      })
+    }
   }
 }
 
