@@ -31,7 +31,7 @@ const goToFolder = async (file: any) => {
         id: file.id,
         name: file.name
       })
-      fileList.value = [...data.data.folders]
+      fileList.value = [...data.data.folders, ...data.data.files]
     } else {
       ElMessage({
         type: 'error',
