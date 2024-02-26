@@ -7,7 +7,13 @@ import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-import { renameFileApi, renameFolderApi, getFolderApi } from '@/api/fileApi'
+import {
+  renameFileApi,
+  renameFolderApi,
+  getFolderApi,
+  deleteFolderApi,
+  deleteFileApi
+} from '@/api/fileApi'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -91,18 +97,67 @@ const renameFolderNameFn = async () => {
 }
 
 // 文件删除
+let deleteFoloderIds: number[] = []
 const fileDelete = (index: number) => {
   ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
   })
-    .then(() => {
-      fileStore.fileDelete(index)
-      ElMessage({
-        type: 'success',
-        message: '删除成功'
-      })
+    .then(async () => {
+      if (fileList.value[index].type === 'folder') {
+        // 删除文件夹进入回收站
+        try {
+          deleteFoloderIds.push(fileList.value[index].id)
+          const { data } = await deleteFolderApi(deleteFoloderIds, 0)
+          if (data.success === true) {
+            fileStore.fileDelete(index)
+            deleteFoloderIds = []
+            ElMessage({
+              type: 'success',
+              message: '删除成功'
+            })
+          } else {
+            deleteFoloderIds = []
+            ElMessage({
+              type: 'error',
+              message: data.msg
+            })
+          }
+        } catch (error: any) {
+          deleteFoloderIds = []
+          ElMessage({
+            type: 'error',
+            message: error.message
+          })
+        }
+      } else {
+        // 删除文件进入回收站
+        try {
+          deleteFoloderIds.push(fileList.value[index].id)
+          const { data } = await deleteFileApi(deleteFoloderIds, 0)
+          if (data.success === true) {
+            fileStore.fileDelete(index)
+            deleteFoloderIds = []
+            ElMessage({
+              type: 'success',
+              message: '删除成功'
+            })
+          } else {
+            deleteFoloderIds = []
+            ElMessage({
+              type: 'error',
+              message: data.msg
+            })
+          }
+        } catch (error: any) {
+          deleteFoloderIds = []
+          ElMessage({
+            type: 'error',
+            message: error.message
+          })
+        }
+      }
     })
     .catch(() => {
       ElMessage({
@@ -268,4 +323,3 @@ function shareConfirm() {}
   display: inline-block !important;
 }
 </style>
-@/api/fileApi
