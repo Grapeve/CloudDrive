@@ -7,7 +7,7 @@ import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-import { renameFileApi, renameFolderApi } from '@/api/fileApi'
+import { renameFileApi, renameFolderApi, getFolderApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -16,21 +16,22 @@ const tableHeight = ref(window.innerHeight - 200)
 const { fileList } = storeToRefs(fileStore)
 
 // 进入文件夹
-const goToFolder = (file: any) => {
+const goToFolder = async (file: any) => {
   if (file.type === 'folder') {
-    breadcrumbStore.addBreadcrumb({
-      id: '123456789',
-      name: file.fileName
-    })
-    // TODO:调接口获取该文件夹的子文件
-    // fileList.value = [
-    //   {
-    //     fileName: '壁纸1',
-    //     fileSize: '-',
-    //     fileChangeDate: '2024-02-09 00:00:00',
-    //     type: 'docx'
-    //   }
-    // ]
+    const { data } = await getFolderApi(file.id, '')
+    if (data.success === true) {
+      // 面包屑导航存入store
+      breadcrumbStore.addBreadcrumb({
+        id: file.id,
+        name: file.name
+      })
+      fileList.value = [...data.data.folders]
+    } else {
+      ElMessage({
+        type: 'error',
+        message: data.msg
+      })
+    }
   }
 }
 

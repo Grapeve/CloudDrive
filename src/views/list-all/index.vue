@@ -10,7 +10,7 @@ import server from '@/utils/axios'
 import FileTable from '@/components/FileTable/index.vue'
 import { useFileStore, type folderType } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { createFolderApi } from '@/api/fileApi'
+import { createFolderApi, getFolderApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
 const { fileList } = storeToRefs(fileStore)
@@ -49,14 +49,36 @@ const createFolder = () => {
   createFolderDebounceFn()
 }
 
-// TODO:点击面包屑左边的全部文件文本返回至最外层
-const goToAllFile = () => {}
-// TODO:点击面包屑返回对应的文件夹列表
-const goToThis = (fileId: string) => {}
+// 点击面包屑左边的全部文件文本返回至最外层
+const goToAllFile = async () => {
+  const { data } = await getFolderApi(-1, '')
+  if (data.success === true) {
+    fileList.value = [...data.data.folders, ...data.data.files]
+    breadcrumbStore.clearBreadcrumb()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: data.msg
+    })
+  }
+}
+// 点击面包屑返回对应的文件夹列表
+const goToThis = async (fileId: string) => {
+  const { data } = await getFolderApi(Number(fileId), '')
+  if (data.success === true) {
+    fileList.value = [...data.data.folders, ...data.data.files]
+    breadcrumbStore.deleteBreadcrumb(fileId)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: data.msg
+    })
+  }
+}
 
 // 首次加载页面时获取所有文件并存入store中
 onBeforeMount(() => {
-  // TODO: 调接口获取文件列表
+  // 调接口获取文件列表
   server
     .post('/folder/getFolder', { folderId: -1 })
     .then((res) => {

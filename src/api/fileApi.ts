@@ -4,6 +4,10 @@ export const renameFileApi = async (id: number, newFilename: string) => {
   return await axios.put('/file', { id: id, newFilename: newFilename })
 }
 
+export const getFolderApi = async (id: number, keyword: string = '') => {
+  return await axios.post('/folder/getFolder', { folderId: id, keyword: keyword })
+}
+
 export const createFolderApi = async (foldername: string, id: number) => {
   return await axios.post('/folder/addFolder', { name: foldername, parentId: id })
 }
