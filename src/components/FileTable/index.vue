@@ -171,16 +171,16 @@ const fileDelete = (index: number) => {
 // 鼠标悬浮至文件时展示文件相关操作
 const showOperation = (row: any, column: any, cell: HTMLElement, event: any) => {
   let parentDiv = cell.firstElementChild as HTMLElement
-  if (parentDiv) {
-    let btnsDiv = parentDiv?.lastElementChild as HTMLElement
+  let btnsDiv = parentDiv?.lastElementChild as HTMLElement
+  if (btnsDiv?.classList?.[0]?.includes('file-operation-content')) {
     btnsDiv.style.display = 'inline-block'
   }
 }
 // 鼠标移出文件时隐藏文件相关操作
 const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) => {
   let parentDiv = cell.firstElementChild as HTMLElement
-  if (parentDiv) {
-    let btnsDiv = parentDiv?.lastElementChild as HTMLElement
+  let btnsDiv = parentDiv?.lastElementChild as HTMLElement
+  if (btnsDiv?.classList?.[0]?.includes('file-operation-content')) {
     btnsDiv.style.display = 'none'
   }
 }
@@ -220,7 +220,7 @@ defineExpose({
     @selection-change="handleSelectionChange"
   >
     <el-table-column type="selection" width="35" />
-    <el-table-column prop="name" label="文件名" min-width="780">
+    <el-table-column prop="name" label="文件名" min-width="780" class="file-show">
       <template #default="scope">
         <div style="display: flex; align-items: center">
           <img
@@ -307,10 +307,10 @@ defineExpose({
       </template>
     </el-table-column>
     <el-table-column prop="size" label="大小" min-width="180">
-      <template #default="scope">
-        <span v-if="scope.row.type === 'folder'">-</span>
+      <template #default="scope1">
+        <span v-if="scope1.row.type === 'folder'">-</span>
         <!-- TODO:文件大小输出格式化 -->
-        <span v-else>{{ convertSize(scope.row.size) }}</span>
+        <span v-else>{{ convertSize(scope1.row.size) }}</span>
       </template>
     </el-table-column>
     <el-table-column prop="update_time" label="修改日期" min-width="200" />
