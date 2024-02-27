@@ -1,7 +1,7 @@
 import router from './router/index'
 import { localGet } from './utils/localStorageFn'
 // 白名单
-const whiteList = ['/login']
+const whiteList = ['/login', '/openShareLink']
 
 /**
  * *路由前置守卫

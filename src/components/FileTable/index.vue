@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch } from 'vue'
+import { ref, getCurrentInstance, watch, inject } from 'vue'
 import { storeToRefs } from 'pinia'
-import dayjs from 'dayjs'
-import { useDebounceFn } from '@vueuse/core'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
@@ -21,6 +19,7 @@ import server from '@/utils/axios'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
+const baseFront = inject('baseFront')
 
 const tableHeight = ref(window.innerHeight - 200)
 const { fileList, multipleSelection } = storeToRefs(fileStore)
@@ -221,13 +220,21 @@ function shareConfirm() {
     .post('/share/addShare', shareInfo.value)
     .then((res) => {
       if (res.data.success) {
+        const codeShow = isProtected.value ? res.data.data.shareCode : '无需提取码'
+        const timeShow = !unlimitedDate.value ? res.data.data.expireTime : '无限期'
+
+        shareVisible.value = false
+        isProtected.value = false
+        unlimitedDate.value = false
         ElMessageBox.alert(
-          '分享链接：https://localhost:5173/share?link=' +
+          '分享链接：' +
+            baseFront +
+            '/openShareLink?link=' +
             res.data.data.shareUrl +
             '<br>提取码：' +
-            res.data.data.shareCode +
+            codeShow +
             '<br>有效期至：' +
-            res.data.data.expireTime,
+            timeShow,
           '分享成功！',
           {
             confirmButtonText: '返回',
