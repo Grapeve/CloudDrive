@@ -11,6 +11,7 @@ import FileTable from '@/components/FileTable/index.vue'
 import { useFileStore, type folderType } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { createFolderApi, getFolderApi, deleteFolderApi, deleteFileApi } from '@/api/fileApi'
+import UploadButton from '@/components/UploadButton/index.vue'
 
 const fileStore = useFileStore()
 const { fileList, multipleSelection } = storeToRefs(fileStore)
@@ -174,12 +175,13 @@ onBeforeMount(() => {
 
 <template>
   <div class="btns-file">
-    <el-button type="primary" color="#0d53ff" class="btn-custom">
+    <!-- <el-button type="primary" color="#0d53ff" class="btn-custom">
       <div style="display: flex; align-items: center; font-weight: 700">
         <el-icon size="14"><Plus /></el-icon>
         <span>上传文件</span>
       </div>
-    </el-button>
+    </el-button> -->
+    <UploadButton style="margin-right: 15px" />
     <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="createFolder">
       <div style="display: flex; align-items: center; font-weight: 700">
         <el-icon size="14"><Folder /></el-icon>
