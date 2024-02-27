@@ -16,6 +16,7 @@ import {
 } from '@/api/fileApi'
 import { convertSize } from '@/utils/index'
 import server from '@/utils/axios'
+import { downloadFile } from '@/utils/fileOperation'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -406,7 +407,7 @@ defineExpose({
         </div>
         <div class="file-operation-content">
           <el-tooltip content="下载" placement="top" effect="light">
-            <el-button circle color="#0d53ff">
+            <el-button circle color="#0d53ff" @click="downloadFile(fileList[scope.$index])">
               <el-icon :size="18"><Download /></el-icon>
             </el-button>
           </el-tooltip>
@@ -532,3 +533,4 @@ defineExpose({
   height: 0px !important;
 }
 </style>
+@/utils/fileOperation

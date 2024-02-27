@@ -48,3 +48,23 @@ export const singleUploadFileApi = async (formData: FormData) => {
 export const addFileDataToDBApi = async (fileData: any) => {
   return await axios.post('/file', { ...fileData })
 }
+
+export const downloadFileApi = async (key: string) => {
+  return await axios.post(
+    '/file/downloadFile',
+    { objectKey: key },
+    {
+      responseType: 'blob'
+    }
+  )
+}
+
+export const downloadFolderApi = (folderId: number) => {
+  return axios.post(
+    'folder/downloadFolder',
+    { folderId },
+    {
+      responseType: 'blob'
+    }
+  )
+}
