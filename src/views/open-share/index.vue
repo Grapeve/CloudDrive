@@ -141,11 +141,17 @@ async function submitCode() {
     fileTable.value = [...data.data.shareFolders, ...data.data.shareFiles]
     pageNo.value = 1
   } else {
-    ElNotification({
-      title: '失败！',
-      message: data.msg,
-      type: 'error'
-    })
+    if (data.code === 3003) {
+      ElNotification({
+        title: '失败！',
+        message: data.msg,
+        type: 'error'
+      })
+    } else if (data.code === 3002) {
+      pageNo.value = 4
+    } else {
+      pageNo.value = 5
+    }
   }
 }
 </script>
@@ -220,6 +226,16 @@ async function submitCode() {
                 分享人：{{ shareInfo.shareUser.username }}
               </div>
               <Table :fileShareList="fileTable" />
+            </div>
+            <div v-else-if="pageNo === 4">
+              <el-result icon="error" title="发生错误">
+                <template #sub-title> 分享链接已过期！ </template>
+              </el-result>
+            </div>
+            <div v-else-if="pageNo === 5">
+              <el-result icon="error" title="发生错误">
+                <template #sub-title> 文件不存在或已删除！ </template>
+              </el-result>
             </div>
             <div v-else-if="pageNo === 9">
               <el-result icon="error" title="发生错误" sub-title="您的分享链接有误，请检查！" />
