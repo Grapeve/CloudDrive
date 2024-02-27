@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref, getCurrentInstance } from 'vue'
+<<<<<<< HEAD
+import { ref, getCurrentInstance,watch } from 'vue'
+=======
+import { ref, watch } from 'vue'
+>>>>>>> ade5e76911c30b29efbc70d20681e5e705db5699
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 
 import {
   renameFileApi,
@@ -17,6 +21,7 @@ import {
   moveFolderApi
 } from '@/api/fileApi'
 import { convertSize } from '@/utils/index'
+import server from '@/utils/axios'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -183,19 +188,69 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
 // 分享相关
 const shareVisible = ref(false)
 const isProtected = ref(false)
+const unlimitedDate = ref(false)
 const shareInfo = ref({
   fileIds: [-1],
   folderIds: [-1],
-  shareCode: '',
+  shareCode: null,
   expireTime: '',
   description: ''
 })
 
-function shareStart(id: any) {
-  console.log(id)
+watch(unlimitedDate, (newData) => {
+  if (newData === true) {
+    shareInfo.value.expireTime = ''
+  }
+})
+
+function shareStart(index: any) {
+  // console.log(fileList.value[index])
+  if (fileList.value[index].type === 'folder') {
+    shareInfo.value.folderIds = [fileList.value[index].id]
+    shareInfo.value.fileIds = []
+  } else {
+    shareInfo.value.fileIds = [fileList.value[index].id]
+    shareInfo.value.folderIds = []
+  }
+  isProtected.value = false
+  shareVisible.value = true
 }
 
-function shareConfirm() {}
+function shareConfirm() {
+  // console.log(shareInfo.value)
+  if (!isProtected.value) {
+    shareInfo.value.shareCode = null
+  }
+  server
+    .post('/share/addShare', shareInfo.value)
+    .then((res) => {
+      if (res.data.success) {
+        ElMessageBox.alert(
+          '分享链接：https://localhost:5173/share?link=' +
+            res.data.data.shareUrl +
+            '<br>提取码：' +
+            res.data.data.shareCode +
+            '<br>有效期至：' +
+            res.data.data.expireTime,
+          '分享成功！',
+          {
+            confirmButtonText: '返回',
+            dangerouslyUseHTMLString: true
+          }
+        )
+      } else {
+        ElNotification({
+          title: '分享失败！',
+          message: res.data.msg,
+          type: 'error'
+        })
+      }
+    })
+    .catch((error) => {
+      // 处理错误
+      console.error('发生错误:', error)
+    })
+}
 
 // 移动文件夹相关
 interface Tree {
@@ -385,18 +440,26 @@ defineExpose({
     <el-table-column prop="update_time" label="修改日期" min-width="200" />
   </el-table>
   <!-- 分享Dialog -->
-  <el-dialog v-model="shareVisible" title="Shipping address" width="500">
-    <el-form :model="shareInfo">
+  <el-dialog v-model="shareVisible" title="分享文件" width="500">
+    <el-form :model="shareInfo" label-width="100px">
       <el-form-item label="分享描述">
         <el-input v-model="shareInfo.description" autocomplete="off" />
       </el-form-item>
       <el-form-item label="分享有效期">
-        <el-input v-model="shareInfo.expireTime" />
+        <el-date-picker
+          v-model="shareInfo.expireTime"
+          type="datetime"
+          placeholder="请选择日期"
+          format="YYYY/MM/DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          :disabled="unlimitedDate"
+        />&nbsp;&nbsp;
+        <el-checkbox label="无限期" v-model="unlimitedDate"></el-checkbox>
       </el-form-item>
       <el-form-item label="需要提取码">
         <el-checkbox v-model="isProtected"></el-checkbox>
       </el-form-item>
-      <el-form-item label="提取码">
+      <el-form-item label="提取码" v-show="isProtected">
         <el-input v-model="shareInfo.shareCode" autocomplete="off" />
       </el-form-item>
     </el-form>
