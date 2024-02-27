@@ -35,3 +35,16 @@ export const moveFolderApi = async (
 ) => {
   return await axios.post('/folder/moveFolder', { srcFolderIds, srcFileIds, destFolderId })
 }
+
+export const singleUploadFileApi = async (formData: FormData) => {
+  return await axios.post('/file/singleUploadFile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+    // responseType: 'blob'
+  })
+}
+
+export const addFileDataToDBApi = async (fileData: any) => {
+  return await axios.post('/file', { ...fileData })
+}
