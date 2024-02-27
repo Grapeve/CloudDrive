@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
@@ -12,7 +12,9 @@ import {
   renameFolderApi,
   getFolderApi,
   deleteFolderApi,
-  deleteFileApi
+  deleteFileApi,
+  getFolderTreeApi,
+  moveFolderApi
 } from '@/api/fileApi'
 import { convertSize } from '@/utils/index'
 
@@ -20,7 +22,7 @@ const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 
 const tableHeight = ref(window.innerHeight - 200)
-const { fileList } = storeToRefs(fileStore)
+const { fileList, multipleSelection } = storeToRefs(fileStore)
 
 // 进入文件夹
 const goToFolder = async (file: any) => {
@@ -40,13 +42,6 @@ const goToFolder = async (file: any) => {
       })
     }
   }
-}
-
-// 多选
-const fileMultipleSelection = ref<any[]>([])
-const handleSelectionChange = (val: any) => {
-  fileMultipleSelection.value = val
-  console.log(fileMultipleSelection.value)
 }
 
 // 文件重命名
@@ -202,9 +197,77 @@ function shareStart(id: any) {
 
 function shareConfirm() {}
 
-// 向外暴露修改文件夹名方法，使创建文件夹时触发修改文件夹名
+// 移动文件夹相关
+interface Tree {
+  label: string
+  id: number
+  children?: Tree[]
+}
+
+const treeProps = {
+  label: 'label',
+  children: 'children'
+}
+const treeRef = ref(null)
+const moveVisible = ref(false)
+const moveFileIndex = ref<number>(0) // 待移动文件夹在store中存储的位置
+const treeData = ref<Tree[]>([])
+const moveFile = async (index: number) => {
+  moveVisible.value = true
+  moveFileIndex.value = index
+  const { data } = await getFolderTreeApi(-1)
+  treeData.value = data.data
+}
+// 移动确认按钮
+let destFolderId: number = -1
+const doChoseTreeNodeCallBack = async (data: Tree) => {
+  let srcFolderIds = []
+  let srcFileIds = []
+  destFolderId = (treeRef.value as any).getCurrentNode()?.id // 目标文件夹id
+  if (destFolderId === undefined) {
+    ElMessage({
+      type: 'warning',
+      message: '未选择移动文件夹'
+    })
+  }
+  if (!!destFolderId && destFolderId !== fileList.value[moveFileIndex.value].id) {
+    if (fileList.value[moveFileIndex.value].type === 'folder') {
+      srcFolderIds.push(fileList.value[moveFileIndex.value].id)
+    } else {
+      srcFileIds.push(fileList.value[moveFileIndex.value].id)
+    }
+    const { data } = await moveFolderApi(srcFolderIds, srcFileIds, destFolderId)
+    if (data.success === true) {
+      ElMessage({
+        type: 'success',
+        message: '移动文件夹成功'
+      })
+      moveVisible.value = false
+      fileStore.fileDelete(moveFileIndex.value)
+    }
+  }
+}
+// 移动取消按钮
+const cancelChoseTreeNodeCallBack = () => {
+  moveVisible.value = false
+  destFolderId = -1
+}
+
+// 多选
+const fileMultipleSelection = ref<any[]>([])
+const handleSelectionChange = (val: any) => {
+  multipleSelection.value = val
+}
+
+const { proxy } = getCurrentInstance() as any
+const clearMultipleSelection = () => {
+  proxy.$refs.fileTableRef.clearSelection()
+}
+
+// 向外暴露修改文件夹名方法，清除多项
 defineExpose({
-  fileRenameFn
+  fileRenameFn,
+  clearMultipleSelection
 })
 </script>
 
@@ -294,7 +357,7 @@ defineExpose({
             </el-button>
           </el-tooltip>
           <el-tooltip content="移动" placement="top" effect="light">
-            <el-button circle color="#ff0f53">
+            <el-button circle color="#ff0f53" @click="moveFile(scope.$index)">
               <el-icon :size="18"><Promotion /></el-icon>
             </el-button>
           </el-tooltip>
@@ -336,6 +399,32 @@ defineExpose({
       <el-button type="primary" @click="shareConfirm"> 确认分享 </el-button>
     </div>
   </el-dialog>
+  <!-- 移动Dialog -->
+  <el-dialog title="移动到" v-model="moveVisible" width="600">
+    <div class="tree-dialog-area">
+      <el-tree
+        :data="treeData"
+        :props="treeProps"
+        node-key="id"
+        :default-expanded-keys="[1]"
+        :expand-on-click-node="false"
+        ref="treeRef"
+      >
+        <template #default="{ node, data }">
+          <div class="treeNode-area">
+            <img src="/src/assets/imgs/folder.png" width="28" height="28" />
+            <span class="treeNode-lable">{{ node.label }}</span>
+          </div>
+        </template>
+      </el-tree>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelChoseTreeNodeCallBack">取消</el-button>
+        <el-button type="primary" @click="doChoseTreeNodeCallBack">移动</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style lang="less" scoped>
@@ -350,5 +439,24 @@ defineExpose({
 }
 :deep(.el-table__row > .el-checkbox) {
   display: inline-block !important;
+}
+
+.tree-dialog-area {
+  :deep(.el-tree-node__content) {
+    height: 33px;
+  }
+}
+.treeNode-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .treeNode-lable {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    margin-left: 4px;
+  }
+}
+.treeNode-empty {
+  height: 0px !important;
 }
 </style>
