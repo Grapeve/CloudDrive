@@ -226,7 +226,7 @@ function shareConfirm() {
         isProtected.value = false
         unlimitedDate.value = false
         ElMessageBox.alert(
-          '分享链接：https://localhost:5173/share?link=' +
+          '分享链接：https://localhost:5173/#/openShareLink/' +
             res.data.data.shareUrl +
             '<br>提取码：' +
             codeShow +
@@ -354,12 +354,12 @@ defineExpose({
             v-else-if="scope.row.type === 'docx'"
           />
           <img :src="scope.row.url" width="32" height="32" v-else-if="scope.row.type === 'img'" />
-          <img
+          <!-- <img
             src="/src/assets/imgs/pdf.png"
             width="32"
             height="32"
             v-else-if="scope.row.mime_type.includes('pdf')"
-          />
+          /> -->
           <img
             src="/src/assets/imgs/music.png"
             width="32"
@@ -372,7 +372,7 @@ defineExpose({
             height="32"
             v-else-if="scope.row.type === 'video'"
           />
-          <img
+          <!-- <img
             src="/src/assets/imgs/excel.png"
             width="32"
             height="32"
@@ -381,7 +381,7 @@ defineExpose({
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               )
             "
-          />
+          /> -->
           <img
             src="/src/assets/imgs/zip.png"
             width="32"
