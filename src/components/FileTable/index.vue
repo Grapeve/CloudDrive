@@ -1,9 +1,5 @@
 <script setup lang="ts">
-<<<<<<< HEAD
-import { ref, getCurrentInstance,watch } from 'vue'
-=======
-import { ref, watch } from 'vue'
->>>>>>> ade5e76911c30b29efbc70d20681e5e705db5699
+import { ref, getCurrentInstance, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
