@@ -36,10 +36,11 @@ export const useFileStore = defineStore('file', () => {
     //   updata_time: '2024-02-09 00:00:00'
     // },
   ])
+  const multipleSelection = ref<(folderType | fileType)[]>([])
 
   function fileDelete(index: number) {
     fileList.value.splice(index, 1)
   }
 
-  return { fileList, fileDelete }
+  return { fileList, multipleSelection, fileDelete }
 })

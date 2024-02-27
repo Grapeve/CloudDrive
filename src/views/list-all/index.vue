@@ -4,16 +4,16 @@ import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { ElMessage, ElNotification } from 'element-plus'
+import { ElMessage, ElNotification, ElMessageBox } from 'element-plus'
 import server from '@/utils/axios'
 
 import FileTable from '@/components/FileTable/index.vue'
 import { useFileStore, type folderType } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { createFolderApi, getFolderApi } from '@/api/fileApi'
+import { createFolderApi, getFolderApi, deleteFolderApi, deleteFileApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
-const { fileList } = storeToRefs(fileStore)
+const { fileList, multipleSelection } = storeToRefs(fileStore)
 
 const breadcrumbStore = useBreadcrumbStore()
 const { breadCrumbs } = storeToRefs(breadcrumbStore)
@@ -21,7 +21,9 @@ const { breadCrumbs } = storeToRefs(breadcrumbStore)
 // 文件列表子组件实例
 interface FileTableRef {
   fileRenameFn: (index: number) => void
+  clearMultipleSelection: () => void
 }
+
 const fileTableRef = ref<FileTableRef | null>(null)
 
 // 创建文件夹
@@ -58,6 +60,64 @@ const createFolder = () => {
   const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
   createFoldername = '新建文件夹-' + currentTime
   createFolderDebounceFn()
+}
+
+// 批量删除文件夹
+const multipleSelectionDelete = () => {
+  ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(async () => {
+      let folderIds: number[] = []
+      let fileIds: number[] = []
+      multipleSelection.value.forEach((item) => {
+        if (item.type === 'folder') {
+          folderIds.push(item.id)
+        } else {
+          fileIds.push(item.id)
+        }
+      })
+      if (folderIds.length > 0) {
+        const { data } = await deleteFolderApi(folderIds, 0)
+        if (data.success === true) {
+          ElMessage({
+            type: 'success',
+            message: '文件夹删除成功'
+          })
+        } else {
+          ElMessage({
+            type: 'error',
+            message: data.msg
+          })
+        }
+      }
+      if (fileIds.length > 0) {
+        const { data } = await deleteFileApi(fileIds, 0)
+        if (data.success === true) {
+          ElMessage({
+            type: 'success',
+            message: '文件删除成功'
+          })
+        } else {
+          ElMessage({
+            type: 'error',
+            message: data.msg
+          })
+        }
+      }
+      multipleSelection.value = new Array()
+      fileTableRef?.value?.clearMultipleSelection()
+      const { data } = await getFolderApi(-1, '')
+      fileList.value = [...data.data.folders, ...data.data.files]
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '删除取消'
+      })
+    })
 }
 
 // 点击面包屑左边的全部文件文本返回至最外层
@@ -126,6 +186,44 @@ onBeforeMount(() => {
         <span>新建文件夹</span>
       </div>
     </el-button>
+    <!-- 多选操作 -->
+    <div class="multiple-selection-area" v-if="multipleSelection.length > 0">
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <span>下载</span>
+        </div>
+      </el-button>
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <span>分享</span>
+        </div>
+      </el-button>
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        v-if="multipleSelection.length === 1"
+      >
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <span>重命名</span>
+        </div>
+      </el-button>
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        @click="multipleSelectionDelete"
+      >
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <span>删除</span>
+        </div>
+      </el-button>
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <span>移动到</span>
+        </div>
+      </el-button>
+    </div>
   </div>
   <div class="file-list">
     <div>
@@ -164,6 +262,13 @@ onBeforeMount(() => {
     color: #52565e;
     border: 1px solid #ddd;
   }
+
+  .multiple-selection-area {
+    margin-left: auto;
+    :deep(.el-button) {
+      margin-left: 0;
+    }
+  }
 }
 
 .file-list {
@@ -195,4 +300,3 @@ onBeforeMount(() => {
   }
 }
 </style>
-@/api/fileApi

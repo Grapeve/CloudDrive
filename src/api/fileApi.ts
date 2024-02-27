@@ -23,3 +23,15 @@ export const renameFolderApi = async (id: number, newFoldername: string) => {
 export const deleteFolderApi = async (ids: number[], status: number = 0) => {
   return await axios.post('folder/deleteFolder', { folderIds: ids, status: status })
 }
+
+export const getFolderTreeApi = async (id: number) => {
+  return await axios.post('/folder/getFolderTree', { folderId: id })
+}
+
+export const moveFolderApi = async (
+  srcFolderIds: number[],
+  srcFileIds: number[],
+  destFolderId: number
+) => {
+  return await axios.post('/folder/moveFolder', { srcFolderIds, srcFileIds, destFolderId })
+}
