@@ -1,22 +1,63 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, getCurrentInstance, onBeforeMount } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { localGet, localRemove } from '@/utils/localStorageFn'
 import server from '@/utils/axios'
 import { ElNotification } from 'element-plus'
+import { browseShareApi } from '@/api/shareApi'
+import Table from '@/components/openShareTable/index.vue'
 
 const route = useRoute()
 const router = useRouter()
-
-const breadcrumbStore = useBreadcrumbStore()
 
 const user = localGet('user')
 
 const usage = ref(0.0)
 
+const shareUrl: string = route.query.link ?? ''
+const code = ref('')
+const shareInfo = ref({
+  shareCode: null,
+  browseCount: 0,
+  description: '',
+  shareFiles: [
+    {
+      id: 70,
+      userId: 1,
+      folderId: -1,
+      name: '1.zip',
+      size: 1,
+      url: 'https://cloud-disk-1314407651.cos.ap-guangzhou.myqcloud.com/2024-02-27/2024-02-27/a7481532-8da9-46f5-a3aa-1cef6c7f7099.png',
+      mimeType: null,
+      checksum: null,
+      objectKey: '2024-02-27/a7481532-8da9-46f5-a3aa-1cef6c7f7099.png',
+      createTime: '2024-02-27 16:51:37',
+      updateTime: '2024-02-27 22:27:31',
+      status: 1,
+      deleteTime: null
+    }
+  ],
+  expireTime: null,
+  createTime: '2024-02-27 22:59:26',
+  shareFileCount: 1,
+  shareUrl: '346005ec-c30a-484c-84d2-59a56c977d61',
+  id: 27,
+  shareFolderCount: 0,
+  downloadCount: 0,
+  shareFolders: [],
+  shareUser: {
+    avatar:
+      'https://cloud-disk-1314407651.cos.ap-guangzhou.myqcloud.com/2024-02-25/5e5de92e-d629-436b-8089-f40f1a032596.jpeg',
+    username: '王五'
+  },
+  saveCount: 0
+})
+const fileTable = ref([{}])
+
 // 获取已使用的空间
-onMounted(() => {
+onBeforeMount(() => {
+  // console.log(shareUrl)
   server
     .get('/file/usingMemory')
     .then((res) => {
@@ -69,14 +110,37 @@ const changeInfo = () => {
   router.push('/changeinfo')
 }
 
-const currentPath = ref('all')
-watch(
-  () => route.path,
-  (val) => {
-    currentPath.value = val.slice(1)
-    breadcrumbStore.clearBreadcrumb()
+// 处理不同页面间切换
+const pageNo = ref(3)
+
+onBeforeMount(() => {
+  if (shareUrl.length === 36) {
+    pageNo.value = 1
+    submitCode()
+  } else if (shareUrl.length === 37) {
+    pageNo.value = 2
   }
-)
+})
+
+// 提交提取码
+async function submitCode() {
+  var scode = null
+  if (pageNo.value === 2) {
+    scode = code.value
+  }
+  const { data } = await browseShareApi(shareUrl, scode)
+  if (data.success === true) {
+    shareInfo.value = data.data
+    fileTable.value = [...data.data.shareFolders, ...data.data.shareFiles]
+    pageNo.value = 1
+  } else {
+    ElNotification({
+      title: '失败！',
+      message: data.msg,
+      type: 'error'
+    })
+  }
+}
 </script>
 
 <template>
@@ -90,10 +154,6 @@ watch(
         <div class="user-info">
           <el-dropdown>
             <div style="display: flex; align-items: center; height: 50px">
-              <!-- <el-avatar
-                :size="45"
-                src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
-              /> -->
               <el-avatar :size="45" :src="user.avatar" />
               <div class="user-info-right-wrap">
                 <span class="user-name">{{ user.username }}</span>
@@ -124,53 +184,39 @@ watch(
         </div>
       </el-header>
       <el-container>
-        <el-aside class="layout-navbar">
-          <!-- 导航栏 -->
-          <div class="layout-navbar-container">
-            <el-menu
-              :default-active="currentPath"
-              text-color="#000000a6"
-              active-text-color="#0d53ff"
-              :router="true"
-            >
-              <el-menu-item index="all" route="all">
-                <el-icon><Files /></el-icon>
-                <span>全部文件</span>
-              </el-menu-item>
-              <el-menu-item index="recent" route="recent">
-                <el-icon><Timer /></el-icon>
-                <span>最近</span>
-              </el-menu-item>
-              <el-menu-item index="video" route="video">
-                <el-icon><VideoCamera /></el-icon>
-                <span>视频</span>
-              </el-menu-item>
-              <el-menu-item index="img" route="img">
-                <el-icon><Picture /></el-icon>
-                <span>图片</span>
-              </el-menu-item>
-              <el-menu-item index="doc" route="doc">
-                <el-icon><Folder /></el-icon>
-                <span>文档</span>
-              </el-menu-item>
-              <el-menu-item index="music" route="music">
-                <el-icon><Headset /></el-icon>
-                <span>音频</span>
-              </el-menu-item>
-              <el-menu-item index="share" route="share">
-                <el-icon><Share /></el-icon>
-                <span>我的分享</span>
-              </el-menu-item>
-              <el-menu-item index="recycle" route="recycle">
-                <el-icon><Delete /></el-icon>
-                <span>回收站</span>
-              </el-menu-item>
-            </el-menu>
-          </div>
-        </el-aside>
         <el-main class="layout-main">
           <div class="layout-main-container">
-            <RouterView />
+            <div v-if="pageNo === 2" style="position: absolute; top: 40%; left: 30%">
+              <el-input
+                v-model="code"
+                size="large"
+                placeholder="请输入提取码"
+                style="width: 200px; margin: 20px"
+              ></el-input>
+              <el-button
+                type="primary"
+                size="large"
+                color="#0d53ff"
+                class="btn-custom"
+                @click="submitCode()"
+              >
+                <div style="display: flex; align-items: center; font-weight: 700">
+                  <span>提取文件</span>
+                </div>
+              </el-button>
+            </div>
+            <div v-else-if="pageNo === 1">
+              <div>
+                分享时间：{{ shareInfo.createTime }} -
+                {{ shareInfo.expireTime ? shareInfo.expireTime : '无限期 ' }} 共分享
+                {{ shareInfo.shareFolderCount + shareInfo.shareFileCount }} 个文件<br />
+                分享人：{{ shareInfo.shareUser.username }}
+              </div>
+              <Table :fileShareList="fileTable" />
+            </div>
+            <div v-else>
+              <el-result icon="error" title="发生错误" sub-title="您的分享链接有误，请检查！" />
+            </div>
           </div>
         </el-main>
       </el-container>

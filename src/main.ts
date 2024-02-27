@@ -1,6 +1,6 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
+import { createApp, provide } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
@@ -23,5 +23,7 @@ app.component('SvgIcon', SvgIcon)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+
+app.provide('baseFront', 'http://localhost:5173/#')
 
 app.mount('#app')

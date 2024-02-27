@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch } from 'vue'
+import { ref, getCurrentInstance, watch, inject } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
@@ -19,6 +19,7 @@ import server from '@/utils/axios'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
+const baseFront = inject('baseFront')
 
 const tableHeight = ref(window.innerHeight - 200)
 const { fileList, multipleSelection } = storeToRefs(fileStore)
@@ -226,7 +227,9 @@ function shareConfirm() {
         isProtected.value = false
         unlimitedDate.value = false
         ElMessageBox.alert(
-          '分享链接：https://localhost:5173/#/openShareLink/' +
+          '分享链接：' +
+            baseFront +
+            '/openShareLink?link=' +
             res.data.data.shareUrl +
             '<br>提取码：' +
             codeShow +

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 
 import server from '@/utils/axios'
@@ -8,6 +8,7 @@ import { Close } from '@element-plus/icons-vue'
 
 const tableHeight = ref(window.innerHeight - 200)
 const shareList = ref([])
+const baseFront = inject('baseFront')
 
 // 复制文字
 function copyText(text: string) {
@@ -64,7 +65,7 @@ const linkVisible = ref(false)
 const linkView = ref('')
 const codeView = ref('')
 function openLinkDialog(index: number) {
-  linkView.value = 'http://localhost:5173/#/openShareLink/' + shareList.value[index].shareUrl
+  linkView.value = baseFront + '/openShareLink?link=' + shareList.value[index].shareUrl
   codeView.value = shareList.value[index].shareCode
   linkVisible.value = true
 }

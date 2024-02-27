@@ -8,6 +8,6 @@ export const getShareListApi = async () => {
   return await axios.get('/share/getShareList')
 }
 
-export const browseShareApi = async (url: string, code: string) => {
+export const browseShareApi = async (url: string, code: any) => {
   return await axios.post('/share/browseShareLink', { shareUrl: url, shareCode: code })
 }
