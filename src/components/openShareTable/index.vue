@@ -113,7 +113,7 @@ const hiddenOperation = (row: any, column: any, cell: HTMLElement, event: any) =
         <span v-else>{{ convertSize(scope1.row.size) }}</span>
       </template>
     </el-table-column>
-    <el-table-column prop="updateTime" label="修改日期" min-width="200" />
+    <el-table-column prop="update_time" label="修改日期" min-width="200" />
   </el-table>
 
   <!-- 移动Dialog -->

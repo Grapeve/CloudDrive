@@ -17,6 +17,10 @@ const usage = ref(0.0)
 
 const shareUrl: string = route.query.link ?? ''
 const code = ref('')
+if (route.query.code) {
+  code.value = route.query.code
+}
+
 const shareInfo = ref({
   shareCode: null,
   browseCount: 0,
@@ -56,7 +60,7 @@ const shareInfo = ref({
 const fileTable = ref([{}])
 
 // 获取已使用的空间
-onBeforeMount(() => {
+function getSpace() {
   // console.log(shareUrl)
   server
     .get('/file/usingMemory')
@@ -75,7 +79,7 @@ onBeforeMount(() => {
       // 处理错误
       console.error('发生错误:', error)
     })
-})
+}
 
 // 注册
 const register = () => {
@@ -111,11 +115,14 @@ const changeInfo = () => {
 }
 
 // 处理不同页面间切换
-const pageNo = ref(3)
+const pageNo = ref(9)
 
 onBeforeMount(() => {
   if (shareUrl.length === 36) {
     pageNo.value = 1
+    submitCode()
+  } else if (code.value !== '') {
+    pageNo.value = 3
     submitCode()
   } else if (shareUrl.length === 37) {
     pageNo.value = 2
@@ -125,7 +132,7 @@ onBeforeMount(() => {
 // 提交提取码
 async function submitCode() {
   var scode = null
-  if (pageNo.value === 2) {
+  if (pageNo.value !== 1) {
     scode = code.value
   }
   const { data } = await browseShareApi(shareUrl, scode)
@@ -134,11 +141,17 @@ async function submitCode() {
     fileTable.value = [...data.data.shareFolders, ...data.data.shareFiles]
     pageNo.value = 1
   } else {
-    ElNotification({
-      title: '失败！',
-      message: data.msg,
-      type: 'error'
-    })
+    if (data.code === 3003) {
+      ElNotification({
+        title: '失败！',
+        message: data.msg,
+        type: 'error'
+      })
+    } else if (data.code === 3002) {
+      pageNo.value = 4
+    } else {
+      pageNo.value = 5
+    }
   }
 }
 </script>
@@ -214,7 +227,17 @@ async function submitCode() {
               </div>
               <Table :fileShareList="fileTable" />
             </div>
-            <div v-else>
+            <div v-else-if="pageNo === 4">
+              <el-result icon="error" title="发生错误">
+                <template #sub-title> 分享链接已过期！ </template>
+              </el-result>
+            </div>
+            <div v-else-if="pageNo === 5">
+              <el-result icon="error" title="发生错误">
+                <template #sub-title> 文件不存在或已删除！ </template>
+              </el-result>
+            </div>
+            <div v-else-if="pageNo === 9">
               <el-result icon="error" title="发生错误" sub-title="您的分享链接有误，请检查！" />
             </div>
           </div>

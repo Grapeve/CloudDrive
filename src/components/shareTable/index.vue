@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import server from '@/utils/axios'
 import { deleteShareApi, getShareListApi } from '@/api/shareApi'
 import { Close } from '@element-plus/icons-vue'
+import router from '@/router'
 
 const tableHeight = ref(window.innerHeight - 200)
 const shareList = ref([])
@@ -71,7 +72,9 @@ function openLinkDialog(index: number) {
 }
 
 // 进入分享
-function goToShare(shareInfo: object) {}
+function goToShare(shareInfo: object) {
+  router.push('/openShareLink?link=' + shareInfo.shareUrl + '&code=' + shareInfo.shareCode)
+}
 
 // 文件删除
 const cancelShare = (index: number) => {
