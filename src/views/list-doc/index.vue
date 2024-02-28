@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, provide} from 'vue'
+import { ref, onBeforeMount, provide } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus'
 
 import SortTable from '@/components/SortTable/index.vue'
 import { useFileStore, type folderType } from '@/stores/file'
 import UploadButton from '@/components/UploadButton/index.vue'
-import { deleteFileApi,searchFilesByMimeTypeApi } from '@/api/fileApi'
-
+import { deleteFileApi, searchFilesByMimeTypeApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
 const { multipleSelection } = storeToRefs(fileStore)
@@ -22,7 +21,6 @@ const fileTableRef = ref<FileTableRef | null>(null)
 const fileList = ref([{}])
 provide('fileList', fileList)
 
-
 // 批量删除文件
 const multipleSelectionDelete = () => {
   ElMessageBox.confirm('文件删除后将保存在回收站，您确定这样做吗？', '删除文件', {
@@ -33,7 +31,7 @@ const multipleSelectionDelete = () => {
     .then(async () => {
       let fileIds: number[] = []
       multipleSelection.value.forEach((item) => {
-          fileIds.push(item.id)
+        fileIds.push(item.id)
       })
       if (fileIds.length > 0) {
         const { data } = await deleteFileApi(fileIds, 0)
@@ -52,7 +50,7 @@ const multipleSelectionDelete = () => {
       multipleSelection.value = new Array()
       fileTableRef?.value?.clearMultipleSelection()
       const { data } = await searchFilesByMimeTypeApi('文档')
-      fileList.value =data.data.files
+      fileList.value = data.data.files
     })
     .catch(() => {
       ElMessage({
@@ -63,9 +61,9 @@ const multipleSelectionDelete = () => {
 }
 
 // 首次加载页面时获取所有文件并存入store中
-onBeforeMount(async() => {
+onBeforeMount(async () => {
   // 调接口获取文件列表
-        const { data } = await searchFilesByMimeTypeApi('文档')
+  const { data } = await searchFilesByMimeTypeApi('文档')
   fileList.value = data.data.files
 })
 </script>
@@ -91,12 +89,22 @@ onBeforeMount(async() => {
           <span>分享</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" v-if="multipleSelection.length === 1">
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        v-if="multipleSelection.length === 1"
+      >
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>重命名</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="multipleSelectionDelete">
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        @click="multipleSelectionDelete"
+      >
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>删除</span>
         </div>
@@ -110,7 +118,7 @@ onBeforeMount(async() => {
   </div>
   <div class="file-list">
     <!-- 文件列表 -->
-    <SortTable ref="fileTableRef" :type="'docx'"/>
+    <SortTable ref="fileTableRef" :type="'docx'" />
   </div>
 </template>
 
