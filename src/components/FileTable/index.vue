@@ -362,7 +362,7 @@ defineExpose({
             src="/src/assets/imgs/pdf.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mimeType.includes('pdf')"
+            v-else-if="scope.row.mime_type.includes('pdf')"
           />
           <img
             src="/src/assets/imgs/music.png"
@@ -381,7 +381,7 @@ defineExpose({
             width="32"
             height="32"
             v-else-if="
-              scope.row.mimeType.includes(
+              scope.row.mime_type.includes(
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               )
             "

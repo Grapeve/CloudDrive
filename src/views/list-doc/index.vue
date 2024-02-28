@@ -118,7 +118,7 @@ onBeforeMount(async () => {
   </div>
   <div class="file-list">
     <!-- 文件列表 -->
-    <SortTable ref="fileTableRef" :type="'docx'" />
+    <SortTable ref="fileTableRef" type="docx" />
   </div>
 </template>
 

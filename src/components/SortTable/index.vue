@@ -316,7 +316,7 @@ defineExpose({
             "
           />
           <img src="/src/assets/imgs/docx.png" width="32" height="32" v-else-if="type === 'docx'" />
-          <img :src="scope.row.url" width="32" height="32" v-else-if="scope.row.type === 'img'" />
+          <img :src="scope.row.url" width="32" height="32" v-else-if="type === 'img'" />
           <img
             src="/src/assets/imgs/music.png"
             width="32"
@@ -333,7 +333,13 @@ defineExpose({
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
 
           <div style="margin-left: 10px; cursor: pointer">
-            {{ scope.row.name }}
+            <span v-if="scope.$index !== renameNo">{{ scope.row.name }} </span>
+            <el-input
+              v-else
+              v-model="fileRenameName"
+              @blur="renameFolderNameFn"
+              @keyup.enter.native="$event.target.blur()"
+            ></el-input>
           </div>
         </div>
         <div class="file-operation-content">
