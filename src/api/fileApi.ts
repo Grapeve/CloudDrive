@@ -28,6 +28,10 @@ export const getFolderTreeApi = async (id: number) => {
   return await axios.post('/folder/getFolderTree', { folderId: id })
 }
 
+export const searchFilesByMimeTypeApi = async (type: string) => {
+  return await axios.post('/folder/searchFilesByMimeType', { type: type })
+}
+
 export const moveFolderApi = async (
   srcFolderIds: number[],
   srcFileIds: number[],

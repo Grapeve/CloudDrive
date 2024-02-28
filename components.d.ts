@@ -39,6 +39,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShareTable: typeof import('./src/components/shareTable/index.vue')['default']
+    SortTable: typeof import('./src/components/SortTable/index.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/index.vue')['default']
     UploadButton: typeof import('./src/components/UploadButton/index.vue')['default']
   }
