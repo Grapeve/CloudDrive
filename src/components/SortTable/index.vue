@@ -303,17 +303,23 @@ defineExpose({
             src="/src/assets/imgs/pdf.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mimeType.includes('pdf')"
+            v-else-if="scope.row.mime_type.includes('pdf')"
           />
           <img
             src="/src/assets/imgs/excel.png"
             width="32"
             height="32"
             v-else-if="
-              scope.row.mimeType.includes(
+              scope.row.mime_type.includes(
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               )
             "
+          />
+          <img
+            src="/src/assets/imgs/zip.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('application/x-zip-compressed')"
           />
           <img src="/src/assets/imgs/docx.png" width="32" height="32" v-else-if="type === 'docx'" />
           <img :src="scope.row.url" width="32" height="32" v-else-if="type === 'img'" />
@@ -329,7 +335,6 @@ defineExpose({
             height="32"
             v-else-if="type === 'video'"
           />
-          <img src="/src/assets/imgs/zip.png" width="32" height="32" v-else-if="type === 'zip'" />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
 
           <div style="margin-left: 10px; cursor: pointer">

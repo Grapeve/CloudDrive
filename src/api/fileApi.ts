@@ -32,6 +32,10 @@ export const searchFilesByMimeTypeApi = async (type: string) => {
   return await axios.post('/folder/searchFilesByMimeType', { type: type })
 }
 
+export const getRecentFilesApi = async () => {
+  return await axios.get('/folder/getRecentFiles')
+}
+
 export const moveFolderApi = async (
   srcFolderIds: number[],
   srcFileIds: number[],
