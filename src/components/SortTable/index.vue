@@ -321,19 +321,30 @@ defineExpose({
             height="32"
             v-else-if="scope.row.mime_type.includes('application/x-zip-compressed')"
           />
-          <img src="/src/assets/imgs/docx.png" width="32" height="32" v-else-if="type === 'docx'" />
+          <img
+            src="/src/assets/imgs/docx.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('wordprocessingml')"
+          />
+          <img
+            src="/src/assets/imgs/zip.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('image')"
+          />
           <img :src="scope.row.url" width="32" height="32" v-else-if="type === 'img'" />
           <img
             src="/src/assets/imgs/music.png"
             width="32"
             height="32"
-            v-else-if="type === 'music'"
+            v-else-if="scope.row.mime_type.includes('audio')"
           />
           <img
             src="/src/assets/imgs/video.png"
             width="32"
             height="32"
-            v-else-if="type === 'video'"
+            v-else-if="scope.row.mime_type.includes('video')"
           />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
 

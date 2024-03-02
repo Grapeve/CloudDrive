@@ -392,6 +392,12 @@ defineExpose({
             height="32"
             v-else-if="scope.row.type === 'zip'"
           />
+          <img
+            src="/src/assets/imgs/zip.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('image')"
+          />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
           <div style="margin-left: 10px; cursor: pointer">
             <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
