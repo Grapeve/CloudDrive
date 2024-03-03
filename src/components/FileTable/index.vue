@@ -355,9 +355,18 @@ defineExpose({
             src="/src/assets/imgs/docx.png"
             width="32"
             height="32"
-            v-else-if="scope.row.type === 'docx'"
+            v-else-if="
+              scope.row.mime_type.includes(
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+              )
+            "
           />
-          <img :src="scope.row.url" width="32" height="32" v-else-if="scope.row.type === 'img'" />
+          <img
+            :src="scope.row.url"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('image')"
+          />
           <img
             src="/src/assets/imgs/pdf.png"
             width="32"
@@ -365,16 +374,22 @@ defineExpose({
             v-else-if="scope.row.mime_type.includes('pdf')"
           />
           <img
+            src="/src/assets/imgs/ppt.png"
+            width="32"
+            height="32"
+            v-else-if="scope.row.mime_type.includes('powerpoint')"
+          />
+          <img
             src="/src/assets/imgs/music.png"
             width="32"
             height="32"
-            v-else-if="scope.row.type === 'music'"
+            v-else-if="scope.row.mime_type.includes('audio')"
           />
           <img
             src="/src/assets/imgs/video.png"
             width="32"
             height="32"
-            v-else-if="scope.row.type === 'video'"
+            v-else-if="scope.row.mime_type.includes('video')"
           />
           <img
             src="/src/assets/imgs/excel.png"
@@ -387,16 +402,16 @@ defineExpose({
             "
           />
           <img
-            src="/src/assets/imgs/zip.png"
+            src="/src/assets/imgs/txt.png"
             width="32"
             height="32"
-            v-else-if="scope.row.type === 'zip'"
+            v-else-if="scope.row.mime_type.includes('text/plain')"
           />
           <img
             src="/src/assets/imgs/zip.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('image')"
+            v-else-if="scope.row.mime_type.includes('application/x-zip-compressed')"
           />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
           <div style="margin-left: 10px; cursor: pointer">
