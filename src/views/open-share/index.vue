@@ -167,9 +167,16 @@ async function submitCode() {
         <div class="user-info">
           <el-dropdown>
             <div style="display: flex; align-items: center; height: 50px">
-              <el-avatar :size="45" :src="user.avatar" />
+              <el-avatar :size="45" :src="user.avatar" v-if="!!user" />
+              <el-avatar
+                :size="45"
+                src="https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132"
+                v-else
+              />
+
               <div class="user-info-right-wrap">
-                <span class="user-name">{{ user.username }}</span>
+                <span class="user-name" v-if="!!user">{{ user.username }}</span>
+                <span class="user-name" v-else></span>
                 <el-progress :percentage="usage / 10.24" color="#0d53ff" :show-text="false" />
                 <span class="user-space"
                   ><span>{{ usage }}</span
