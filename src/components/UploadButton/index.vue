@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { singleUploadFileApi, addFileDataToDBApi } from '@/api/fileApi'
+import { singleUploadFileApi, addFileDataToDBApi, getFolderApi } from '@/api/fileApi'
+import { ElMessage } from 'element-plus'
 
 const breadcrumbStore = useBreadcrumbStore()
 const { breadCrumbs } = storeToRefs(breadcrumbStore)
+
+const fileStore = useFileStore()
+const { fileList } = storeToRefs(fileStore)
 
 const uploadRef = ref()
 const uploadFileList = ref<any[]>([])
@@ -23,6 +28,10 @@ const uploadFile = async () => {
   uploadFileList.value.forEach((file) => {
     uploadFormData.append('file', file)
   })
+  ElMessage({
+    type: 'success',
+    message: '上传中，请稍等！'
+  })
   const { data } = await singleUploadFileApi(uploadFormData)
   if (data.success === true) {
     const fileData = data.data
@@ -31,7 +40,20 @@ const uploadFile = async () => {
       parentId = Number(breadCrumbs.value[breadCrumbs.value.length - 1].id)
     }
     fileData.folderId = parentId
-    const res = await addFileDataToDBApi(fileData)
+    const res = await addFileDataToDBApi(fileData) // 将文件数据插入数据库
+    if (res.data.success === true) {
+      const res = await getFolderApi(parentId)
+      fileList.value = [...res.data.data.folders, ...res.data.data.files]
+      ElMessage({
+        type: 'success',
+        message: '上传成功！'
+      })
+    } else {
+      ElMessage({
+        type: 'error',
+        message: res.data.msg
+      })
+    }
   }
 }
 
