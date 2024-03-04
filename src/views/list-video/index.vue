@@ -3,13 +3,14 @@ import { ref, onBeforeMount, provide } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus'
 
-import SortTable from '@/components/SortTable/index.vue'
+// import SortTable from '@/components/SortTable/index.vue'
+import FileTable from '@/components/FileTable/index.vue'
 import { useFileStore, type folderType } from '@/stores/file'
 import UploadButton from '@/components/UploadButton/index.vue'
 import { deleteFileApi, searchFilesByMimeTypeApi } from '@/api/fileApi'
 
 const fileStore = useFileStore()
-const { multipleSelection } = storeToRefs(fileStore)
+const { fileList, multipleSelection } = storeToRefs(fileStore)
 
 // 文件列表子组件实例
 interface FileTableRef {
@@ -18,7 +19,7 @@ interface FileTableRef {
 }
 
 const fileTableRef = ref<FileTableRef | null>(null)
-const fileList = ref([{}])
+// const fileList = ref([{}])
 provide('fileList', fileList)
 
 // 批量删除文件
@@ -118,7 +119,8 @@ onBeforeMount(async () => {
   </div>
   <div class="file-list">
     <!-- 文件列表 -->
-    <SortTable ref="fileTableRef" type="video" />
+    <!-- <SortTable ref="fileTableRef" type="video" /> -->
+    <FileTable ref="fileTableRef" />
   </div>
 </template>
 
