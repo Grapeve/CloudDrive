@@ -22,7 +22,7 @@ function loginSubmit() {
         })
         localSet('token', response.data.data.token)
         localSet('user', response.data.data.user)
-        console.log(localGet('token'))
+        // console.log(localGet('token'))
         router.push('/')
       } else {
         ElNotification({

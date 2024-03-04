@@ -31,6 +31,10 @@ export const downloadFile = (file: fileType | folderType) => {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
+      ElMessage({
+        type: 'success',
+        message: '下载中，请误关闭浏览器！'
+      })
       // const { data } = await downloadFolderApi(fileList.value[index].id)
       downloadFolderApi(file.id).then((res) => {
         browserDownload(res.data, file.name)
@@ -42,6 +46,10 @@ export const downloadFile = (file: fileType | folderType) => {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => {
+      ElMessage({
+        type: 'success',
+        message: '下载中，请误关闭浏览器！'
+      })
       const { data } = await downloadFileApi((file as fileType).object_key)
       browserDownload(data, file.name)
     })

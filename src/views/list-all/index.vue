@@ -151,7 +151,7 @@ const goToThis = async (fileId: string) => {
 }
 
 // 首次加载页面时获取所有文件并存入store中
-onBeforeMount(() => {
+onMounted(() => {
   // 调接口获取文件列表
   server
     .post('/folder/getFolder', { folderId: -1 })
