@@ -53,6 +53,14 @@ export const singleUploadFileApi = async (formData: FormData) => {
   })
 }
 
+export const uploadFolderApi = async (parentId: number, formData: FormData) => {
+  return await axios.post(`/folder/uploadFolder?parentId=${parentId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
 export const addFileDataToDBApi = async (fileData: any) => {
   return await axios.post('/file', { ...fileData })
 }

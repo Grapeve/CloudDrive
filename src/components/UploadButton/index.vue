@@ -3,7 +3,12 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { singleUploadFileApi, addFileDataToDBApi, getFolderApi } from '@/api/fileApi'
+import {
+  singleUploadFileApi,
+  addFileDataToDBApi,
+  getFolderApi,
+  uploadFolderApi
+} from '@/api/fileApi'
 import { ElMessage } from 'element-plus'
 
 const breadcrumbStore = useBreadcrumbStore()
@@ -56,6 +61,40 @@ const uploadFile = async () => {
     }
   }
 }
+// 上传文件夹
+const uploadFolderRef = ref()
+const uploadFolder = () => {
+  uploadFolderRef.value.click()
+}
+const selectFolder = async (event: any) => {
+  const files = event.target.files
+  const formData = new FormData()
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files', files[i])
+  }
+  let parentId = -1
+  if (breadCrumbs.value.length > 0) {
+    parentId = Number(breadCrumbs.value[breadCrumbs.value.length - 1].id)
+  }
+  ElMessage({
+    type: 'success',
+    message: '上传文件夹中，请稍等！'
+  })
+  const { data } = await uploadFolderApi(parentId, formData)
+  if (data.success === true) {
+    ElMessage({
+      type: 'success',
+      message: '上传成功！'
+    })
+    const res = await getFolderApi(parentId)
+    fileList.value = [...res.data.data.folders, ...res.data.data.files]
+  } else {
+    ElMessage({
+      type: 'error',
+      message: data.msg
+    })
+  }
+}
 
 // 上传Dialog
 const uploadDialogVisible = ref(false)
@@ -63,17 +102,34 @@ const uploadDialogVisible = ref(false)
 
 <template>
   <div class="upload-area">
-    <el-button
-      type="primary"
-      color="#0d53ff"
-      class="btn-custom"
-      @click="uploadDialogVisible = true"
-    >
-      <div style="display: flex; align-items: center; font-weight: 700">
-        <el-icon size="14"><Plus /></el-icon>
-        <span>上传文件</span>
-      </div>
-    </el-button>
+    <el-dropdown :visible-arrow="false">
+      <el-button
+        type="primary"
+        color="#0d53ff"
+        class="btn-custom"
+        @click="uploadDialogVisible = true"
+      >
+        <div style="display: flex; align-items: center; font-weight: 700">
+          <el-icon size="14"><Plus /></el-icon>
+          <span>上传文件</span>
+        </div>
+      </el-button>
+      <template #dropdown>
+        <el-dropdown-menu style="width: 110px">
+          <el-dropdown-item @click="uploadDialogVisible = true">文件</el-dropdown-item>
+          <el-dropdown-item>
+            <span @click="uploadFolder">文件夹</span>
+            <input
+              type="file"
+              style="display: none"
+              ref="uploadFolderRef"
+              webkitdirectory
+              :onchange="selectFolder"
+            />
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
     <!-- 上传文件Dialog -->
     <el-dialog title="上传文件" v-model="uploadDialogVisible" width="650">
       <el-upload
@@ -86,7 +142,7 @@ const uploadDialogVisible = ref(false)
         :limit="1"
       >
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">将文件拖拽至此处，或<em>点击上传</em></div>
+        <div class="el-upload__text">将文件拖拽至此处，或<em>点击上传</em>，只能上传单个文件</div>
       </el-upload>
       <template #footer>
         <div class="dialog-footer">
@@ -99,6 +155,11 @@ const uploadDialogVisible = ref(false)
 </template>
 
 <style lang="less" scoped>
+.upload-area {
+  :deep(.el-popper > .el-popper__arrow) {
+    display: none !important;
+  }
+}
 .btn-custom {
   height: 36px;
   line-height: 36px;
