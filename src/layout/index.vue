@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElNotification } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
+
+import server from '@/utils/axios'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { localGet, localRemove } from '@/utils/localStorageFn'
-import server from '@/utils/axios'
-import { ElNotification } from 'element-plus'
+import { useFileStore } from '@/stores/file'
+import { searchFileOrFolders } from '@/api/fileApi'
 
 const route = useRoute()
 const router = useRouter()
 
 const breadcrumbStore = useBreadcrumbStore()
+
+const fileStore = useFileStore()
+const { fileList } = storeToRefs(fileStore)
 
 const user = localGet('user')
 
@@ -69,6 +77,27 @@ const changeInfo = () => {
   router.push('/changeinfo')
 }
 
+// 搜索
+const searchInput = ref<string>('')
+const searchFile = async () => {
+  console.log(searchInput.value)
+  const { data } = await searchFileOrFolders(-1, searchInput.value)
+  if (data.success === true) {
+    breadcrumbStore.addBreadcrumb({
+      id: -1,
+      name: `搜索: ${searchInput.value}`
+    })
+    fileList.value = [...data.data.files, ...data.data.folders]
+  } else {
+    ElMessage({
+      type: 'error',
+      message: data.msg
+    })
+  }
+
+  searchInput.value = ''
+}
+
 const currentPath = ref('all')
 watch(
   () => route.path,
@@ -87,40 +116,54 @@ watch(
           <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
           <span>简存取云盘</span>
         </div>
-        <div class="user-info">
-          <el-dropdown>
-            <div style="display: flex; align-items: center; height: 50px">
-              <!-- <el-avatar
+        <div class="right-content">
+          <div class="serach-area">
+            <el-input
+              v-model="searchInput"
+              placeholder="搜索全部文件"
+              style="height: 36px"
+              @change="searchFile"
+            >
+              <template #prepend>
+                <el-button :icon="Search" />
+              </template>
+            </el-input>
+          </div>
+          <div class="user-info">
+            <el-dropdown>
+              <div style="display: flex; align-items: center; height: 50px">
+                <!-- <el-avatar
                 :size="45"
                 src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
               /> -->
-              <el-avatar :size="45" :src="user.avatar" />
-              <div class="user-info-right-wrap">
-                <span class="user-name">{{ user.username }}</span>
-                <el-progress :percentage="usage / 10.24" color="#0d53ff" :show-text="false" />
-                <span class="user-space"
-                  ><span>{{ usage }}</span
-                  >M / 1G</span
-                >
+                <el-avatar :size="45" :src="user.avatar" />
+                <div class="user-info-right-wrap">
+                  <span class="user-name">{{ user.username }}</span>
+                  <el-progress :percentage="usage / 10.24" color="#0d53ff" :show-text="false" />
+                  <span class="user-space"
+                    ><span>{{ usage }}</span
+                    >M / 1G</span
+                  >
+                </div>
               </div>
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>
-                  <div @click="changeInfo">修改个人信息</div>
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <div @click="updateAvatar">更新头像</div>
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <div @click="changePwd">修改密码</div>
-                </el-dropdown-item>
-                <el-dropdown-item>
-                  <div @click="logout">退出登录</div>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>
+                    <div @click="changeInfo">修改个人信息</div>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <div @click="updateAvatar">更新头像</div>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <div @click="changePwd">修改密码</div>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <div @click="logout">退出登录</div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </el-header>
       <el-container>
@@ -193,6 +236,18 @@ watch(
     padding-left: 25px;
     font-size: 24px;
     font-weight: 600;
+  }
+  .right-content {
+    margin: 0 10px 0 auto;
+    display: flex;
+    align-items: center;
+  }
+  .serach-area {
+    height: 36px;
+    width: 200px;
+    border-radius: 8px;
+    background-color: #fff;
+    margin: 0 20px 0 0;
   }
   .user-info {
     height: 50px;

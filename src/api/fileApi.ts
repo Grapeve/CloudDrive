@@ -77,10 +77,18 @@ export const downloadFileApi = async (key: string) => {
 
 export const downloadFolderApi = (folderId: number) => {
   return axios.post(
-    'folder/downloadFolder',
+    '/folder/downloadFolder',
     { folderId },
     {
       responseType: 'blob'
     }
   )
+}
+
+export const getRecycleBinApi = () => {
+  return axios.get('/folder/getRecycleBin')
+}
+
+export const searchFileOrFolders = (id: number, keyword: string = '') => {
+  return axios.post('folder/searchFilesOrFolders', { folderId: id, keyword: keyword })
 }
