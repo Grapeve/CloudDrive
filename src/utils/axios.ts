@@ -13,7 +13,14 @@ const server = axios.create({
 })
 
 // 请求拦截器，后续有需要再添加
-server.interceptors.request.use()
+server.interceptors.request.use((config) => {
+  if (localGet('token')) {
+    if (config.headers.token === '') {
+      config.headers.token = localGet('token')
+    }
+  }
+  return config
+})
 
 // 响应拦截器，后续有需要再添加
 server.interceptors.response
