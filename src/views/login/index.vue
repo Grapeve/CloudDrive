@@ -49,7 +49,10 @@ function loginSubmit() {
         <el-input v-model="loginForm.password" show-password />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="loginSubmit">登录</el-button>
+        <el-button type="primary" @click="loginSubmit" style="width: 92px">登录</el-button>
+        <el-button type="primary" @click="router.push('/register')" style="width: 92px">
+          注册
+        </el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -62,7 +65,7 @@ function loginSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  padding: 0 140px 0 0;
 }
 </style>

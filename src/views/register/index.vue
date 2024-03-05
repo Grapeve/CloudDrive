@@ -108,7 +108,12 @@ function sendCode() {
         <el-input v-model="regForm.code" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="regSubmit">注册</el-button>
+        <el-button type="primary" @click="regSubmit" style="width: 227px">注册</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="router.push('/login')" style="width: 227px">
+          返回登录
+        </el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -117,11 +122,10 @@ function sendCode() {
 <style scoped>
 .login {
   width: 50vh;
-  height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  padding: 20px 150px 0 0;
 }
 </style>
