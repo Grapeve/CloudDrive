@@ -80,11 +80,10 @@ const changeInfo = () => {
 // 搜索
 const searchInput = ref<string>('')
 const searchFile = async () => {
-  console.log(searchInput.value)
   const { data } = await searchFileOrFolders(-1, searchInput.value)
   if (data.success === true) {
     breadcrumbStore.addBreadcrumb({
-      id: -1,
+      id: '-1',
       name: `搜索: ${searchInput.value}`
     })
     fileList.value = [...data.data.files, ...data.data.folders]
@@ -103,6 +102,7 @@ watch(
   () => route.path,
   (val) => {
     currentPath.value = val.slice(1)
+    fileList.value = new Array()
     breadcrumbStore.clearBreadcrumb()
   }
 )
@@ -123,10 +123,8 @@ watch(
               placeholder="搜索全部文件"
               style="height: 36px"
               @change="searchFile"
+              :prefix-icon="Search"
             >
-              <template #prepend>
-                <el-button :icon="Search" />
-              </template>
             </el-input>
           </div>
           <div class="user-info">
