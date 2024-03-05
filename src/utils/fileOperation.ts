@@ -109,7 +109,7 @@ export const downloadSharedFile = async (
     message: '下载中，请勿关闭浏览器！'
   })
   const { data } = await downloadSharedFileApi(shareInfo.shareUrl, shareInfo.code)
-  if (data.success === true) {
+  if (data.size > 0) {
     browserDownload(data, file.name)
   } else {
     ElMessage({
