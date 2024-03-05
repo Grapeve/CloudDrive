@@ -12,7 +12,9 @@ import {
   deleteFolderApi,
   deleteFileApi,
   getFolderTreeApi,
-  moveFolderApi
+  moveFolderApi,
+  retrieveFileApi,
+  retrieveFolderApi
 } from '@/api/fileApi'
 import { convertSize } from '@/utils/index'
 import server from '@/utils/axios'
@@ -22,8 +24,21 @@ const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
 const baseFront = inject('baseFront')
 
-const tableHeight = ref(window.innerHeight - 200)
+// const tableHeight = ref(window.innerHeight - 200)
 const { fileList, multipleSelection } = storeToRefs(fileStore)
+
+const props = defineProps({
+  showType: {
+    type: String,
+    required: false,
+    default: 'common'
+  },
+  tableHeight: {
+    type: Number,
+    required: false,
+    default: window.innerHeight * 0.71
+  }
+})
 
 // 进入文件夹
 const goToFolder = async (file: any) => {
@@ -162,6 +177,78 @@ const fileDelete = (index: number) => {
         message: '删除取消'
       })
     })
+}
+
+// 文件还原
+const recycleFile = async (index: number) => {
+  if (fileList.value[index].type === 'folder') {
+    const { data } = await retrieveFolderApi([fileList.value[index].id])
+    if (data.success === true) {
+      fileStore.fileDelete(index)
+      ElMessage({
+        type: 'success',
+        message: '文件夹还原成功！'
+      })
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '文件夹还原失败！'
+      })
+    }
+  } else {
+    const { data } = await retrieveFileApi([fileList.value[index].id])
+    if (data.success === true) {
+      fileStore.fileDelete(index)
+      ElMessage({
+        type: 'success',
+        message: '文件还原成功！'
+      })
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '文件还原失败！'
+      })
+    }
+  }
+}
+
+// 文件彻底删除
+const completeDeleteFile = (index: number) => {
+  ElMessageBox.confirm('文件删除后将不可恢复，您确定这样做吗？', '删除文件', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    if (fileList.value[index].type === 'folder') {
+      const { data } = await deleteFolderApi([fileList.value[index].id], 2)
+      if (data.success === true) {
+        fileStore.fileDelete(index)
+        ElMessage({
+          type: 'success',
+          message: '文件夹彻底删除成功！'
+        })
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '文件夹彻底删除失败！'
+        })
+      }
+    } else {
+      const { data } = await deleteFileApi([fileList.value[index].id], 2)
+      if (data.success === true) {
+        fileStore.fileDelete(index)
+        ElMessage({
+          type: 'success',
+          message: '文件彻底删除成功！'
+        })
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '文件彻底删除失败！'
+        })
+      }
+    }
+  })
 }
 
 // 鼠标悬浮至文件时展示文件相关操作
@@ -336,7 +423,7 @@ defineExpose({
     :data="fileList"
     ref="fileTableRef"
     style="width: 100%"
-    :height="tableHeight"
+    :height="props.tableHeight"
     @cell-mouse-enter="showOperation"
     @cell-mouse-leave="hiddenOperation"
     @selection-change="handleSelectionChange"
@@ -356,47 +443,46 @@ defineExpose({
             width="32"
             height="32"
             v-else-if="
-              scope.row.mime_type.includes(
+              scope.row.mime_type?.includes(
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
               )
             "
           />
-          <img
+          <el-image
             :src="scope.row.url"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type.includes('image')"
+            style="width: 32px; height: 32px"
+            v-else-if="scope.row.mime_type?.includes('image')"
           />
           <img
             src="/src/assets/imgs/pdf.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('pdf')"
+            v-else-if="scope.row.mime_type?.includes('pdf')"
           />
           <img
             src="/src/assets/imgs/ppt.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('powerpoint')"
+            v-else-if="scope.row.mime_type?.includes('powerpoint')"
           />
           <img
             src="/src/assets/imgs/music.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('audio')"
+            v-else-if="scope.row.mime_type?.includes('audio')"
           />
           <img
             src="/src/assets/imgs/video.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('video')"
+            v-else-if="scope.row.mime_type?.includes('video')"
           />
           <img
             src="/src/assets/imgs/excel.png"
             width="32"
             height="32"
             v-else-if="
-              scope.row.mime_type.includes(
+              scope.row.mime_type?.includes(
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               )
             "
@@ -405,13 +491,13 @@ defineExpose({
             src="/src/assets/imgs/txt.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('text/plain')"
+            v-else-if="scope.row.mime_type?.includes('text/plain')"
           />
           <img
             src="/src/assets/imgs/zip.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type.includes('application/x-zip-compressed')"
+            v-else-if="scope.row.mime_type?.includes('application/x-zip-compressed')"
           />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
           <div style="margin-left: 10px; cursor: pointer">
@@ -427,31 +513,45 @@ defineExpose({
           </div>
         </div>
         <div class="file-operation-content">
-          <el-tooltip content="下载" placement="top" effect="light">
-            <el-button circle color="#0d53ff" @click="downloadFile(fileList[scope.$index])">
-              <el-icon :size="18"><Download /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip content="重命名" placement="top" effect="light">
-            <el-button circle color="#bb0fff" @click="fileRenameFn(scope.$index)">
-              <el-icon :size="18"><EditPen /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip content="分享" placement="top" effect="light">
-            <el-button circle color="#ff0fcb" @click="shareStart(scope.$index)">
-              <el-icon :size="18"><Share /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip content="移动" placement="top" effect="light">
-            <el-button circle color="#ff0f53" @click="moveFile(scope.$index)">
-              <el-icon :size="18"><Promotion /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip content="删除" placement="top" effect="light">
-            <el-button circle color="#ff430f" @click="fileDelete(scope.$index)">
-              <el-icon :size="18"><Delete /></el-icon>
-            </el-button>
-          </el-tooltip>
+          <div v-if="props.showType === 'common'">
+            <el-tooltip content="下载" placement="top" effect="light">
+              <el-button circle color="#0d53ff" @click="downloadFile(fileList[scope.$index])">
+                <el-icon :size="18"><Download /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="重命名" placement="top" effect="light">
+              <el-button circle color="#bb0fff" @click="fileRenameFn(scope.$index)">
+                <el-icon :size="18"><EditPen /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="分享" placement="top" effect="light">
+              <el-button circle color="#ff0fcb" @click="shareStart(scope.$index)">
+                <el-icon :size="18"><Share /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="移动" placement="top" effect="light">
+              <el-button circle color="#ff0f53" @click="moveFile(scope.$index)">
+                <el-icon :size="18"><Promotion /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="删除" placement="top" effect="light">
+              <el-button circle color="#ff430f" @click="fileDelete(scope.$index)">
+                <el-icon :size="18"><Delete /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
+          <div v-else-if="props.showType === 'recycle'">
+            <el-tooltip content="还原" placement="top" effect="light">
+              <el-button circle color="#67C23A" @click="recycleFile(scope.$index)">
+                <el-icon :size="18" style="color: white"><Refresh /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="彻底删除" placement="top" effect="light">
+              <el-button circle color="#ef4343" @click="completeDeleteFile(scope.$index)">
+                <el-icon :size="18"><Delete /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
         </div>
       </template>
     </el-table-column>
@@ -462,7 +562,13 @@ defineExpose({
         <span v-else>{{ convertSize(scope1.row.size) }}</span>
       </template>
     </el-table-column>
-    <el-table-column prop="update_time" label="修改日期" min-width="200" />
+    <el-table-column
+      prop="delete_time"
+      label="删除日期"
+      min-width="200"
+      v-if="props.showType === 'recycle'"
+    />
+    <el-table-column prop="update_time" label="修改日期" min-width="200" v-else />
   </el-table>
   <!-- 分享Dialog -->
   <el-dialog v-model="shareVisible" title="分享文件" width="500">

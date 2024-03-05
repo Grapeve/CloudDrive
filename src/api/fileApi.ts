@@ -21,7 +21,7 @@ export const renameFolderApi = async (id: number, newFoldername: string) => {
 }
 
 export const deleteFolderApi = async (ids: number[], status: number = 0) => {
-  return await axios.post('folder/deleteFolder', { folderIds: ids, status: status })
+  return await axios.post('/folder/deleteFolder', { folderIds: ids, status: status })
 }
 
 export const getFolderTreeApi = async (id: number) => {
@@ -85,10 +85,23 @@ export const downloadFolderApi = (folderId: number) => {
   )
 }
 
+// 浏览回收站文件
 export const getRecycleBinApi = () => {
   return axios.get('/folder/getRecycleBin')
 }
 
+// 在某个文件夹下搜索文件或文件夹（既搜索当前文件夹，也搜索子孙文件夹）
 export const searchFileOrFolders = (id: number, keyword: string = '') => {
   return axios.post('folder/searchFilesOrFolders', { folderId: id, keyword: keyword })
+}
+
+// 批量从回收站取回文件
+export const retrieveFileApi = (idList: Number[]) => {
+  return axios.put('/file/retrieveFile', { idList: idList })
+}
+
+// 批量从回收站取回文件夹
+export const retrieveFolderApi = (idList: Number[]) => {
+  console.log(idList)
+  return axios.post('/folder/retrieveFolder', { folderIds: idList })
 }
