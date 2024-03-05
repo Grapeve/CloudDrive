@@ -7,7 +7,7 @@ import { deleteShareApi, getShareListApi } from '@/api/shareApi'
 import { Close } from '@element-plus/icons-vue'
 import router from '@/router'
 
-const tableHeight = ref(window.innerHeight - 200)
+const tableHeight = ref(window.innerHeight * 0.896)
 const shareList = ref([])
 const baseFront = inject('baseFront')
 

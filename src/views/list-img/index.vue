@@ -9,6 +9,8 @@ import { useFileStore, type folderType } from '@/stores/file'
 import UploadButton from '@/components/UploadButton/index.vue'
 import { deleteFileApi, searchFilesByMimeTypeApi } from '@/api/fileApi'
 
+const tableHeight = ref(window.innerHeight * 0.798)
+
 const fileStore = useFileStore()
 const { fileList, multipleSelection } = storeToRefs(fileStore)
 
@@ -120,7 +122,7 @@ onBeforeMount(async () => {
   <div class="file-list">
     <!-- 文件列表 -->
     <!-- <SortTable ref="fileTableRef" type="img" /> -->
-    <FileTable ref="fileTableRef" />
+    <FileTable ref="fileTableRef" :table-height="tableHeight" />
   </div>
 </template>
 
