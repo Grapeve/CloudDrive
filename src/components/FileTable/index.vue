@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch, inject } from 'vue'
+import { ref, getCurrentInstance, watch, inject, type PropType } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileStore } from '@/stores/file'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
@@ -16,9 +16,10 @@ import {
   retrieveFileApi,
   retrieveFolderApi
 } from '@/api/fileApi'
+import { getSharedFolderApi } from '@/api/shareApi'
 import { convertSize } from '@/utils/index'
 import server from '@/utils/axios'
-import { downloadFile } from '@/utils/fileOperation'
+import { downloadFile, saveToMine, downloadSharedFile } from '@/utils/fileOperation'
 
 const fileStore = useFileStore()
 const breadcrumbStore = useBreadcrumbStore()
@@ -26,6 +27,11 @@ const baseFront = inject('baseFront')
 
 // const tableHeight = ref(window.innerHeight - 200)
 const { fileList, multipleSelection } = storeToRefs(fileStore)
+
+interface ShareInfo {
+  shareUrl: string
+  code: string
+}
 
 const props = defineProps({
   showType: {
@@ -37,11 +43,27 @@ const props = defineProps({
     type: Number,
     required: false,
     default: window.innerHeight * 0.71
+  },
+  shareInfo: {
+    type: Object as PropType<ShareInfo>,
+    required: false
   }
 })
 
 // 进入文件夹
 const goToFolder = async (file: any) => {
+  // 分享页面浏览文件夹
+  if (props.showType === 'share') {
+    const { data } = await getSharedFolderApi(file.id)
+    if (data.success === true) {
+      breadcrumbStore.addBreadcrumb({
+        id: file.id,
+        name: file.name
+      })
+      fileList.value = [...data.data.folders, ...data.data.files]
+    }
+    return
+  }
   if (file.type === 'folder') {
     const { data } = await getFolderApi(file.id, '')
     if (data.success === true) {
@@ -549,6 +571,26 @@ defineExpose({
             <el-tooltip content="彻底删除" placement="top" effect="light">
               <el-button circle color="#ef4343" @click="completeDeleteFile(scope.$index)">
                 <el-icon :size="18"><Delete /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
+          <div v-else-if="props.showType === 'share'">
+            <el-tooltip content="下载" placement="top" effect="light">
+              <el-button
+                circle
+                color="#0d53ff"
+                @click="downloadSharedFile(fileList[scope.$index], props.shareInfo!)"
+              >
+                <el-icon :size="18"><Download /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="保存到网盘" placement="top" effect="light">
+              <el-button
+                circle
+                color="#bb0fff"
+                @click="saveToMine(fileList[scope.$index], props.shareInfo!)"
+              >
+                <el-icon :size="18"><PartlyCloudy /></el-icon>
               </el-button>
             </el-tooltip>
           </div>

@@ -1,12 +1,23 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, getCurrentInstance, onBeforeMount } from 'vue'
+import { storeToRefs } from 'pinia'
 import { RouterView, useRoute, useRouter } from 'vue-router'
-import { useBreadcrumbStore } from '@/stores/breadcrumb'
-import { localGet, localRemove } from '@/utils/localStorageFn'
-import server from '@/utils/axios'
+import { ref, watch, onMounted, getCurrentInstance, onBeforeMount } from 'vue'
 import { ElNotification } from 'element-plus'
-import { browseShareApi } from '@/api/shareApi'
-import Table from '@/components/openShareTable/index.vue'
+import { ArrowRight } from '@element-plus/icons-vue'
+
+// import Table from '@/components/openShareTable/index.vue'
+import Table from '@/components/FileTable/index.vue'
+import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import { useFileStore } from '@/stores/file'
+import { localGet, localRemove } from '@/utils/localStorageFn'
+import { browseShareApi, getSharedFolderApi } from '@/api/shareApi'
+import server from '@/utils/axios'
+
+const breadcrumbStore = useBreadcrumbStore()
+const { breadCrumbs } = storeToRefs(breadcrumbStore)
+
+const fileStore = useFileStore()
+const { fileList } = storeToRefs(fileStore)
 
 const route = useRoute()
 const router = useRouter()
@@ -15,7 +26,9 @@ const user = localGet('user')
 
 const usage = ref(0.0)
 
-const shareUrl: string = route.query.link ?? ''
+const tableHeight = ref(window.innerHeight * 0.68)
+
+const shareUrl = route.query.link ?? ''
 const code = ref('')
 if (route.query.code) {
   code.value = route.query.code
@@ -129,6 +142,16 @@ onBeforeMount(() => {
   }
 })
 
+onMounted(() => {
+  if (localGet('token')) {
+    server.get('/file/usingMemory').then((res) => {
+      if (res.data.success) {
+        usage.value = res.data.data.toFixed(2)
+      }
+    })
+  }
+})
+
 // 提交提取码
 async function submitCode() {
   var scode = null
@@ -138,7 +161,7 @@ async function submitCode() {
   const { data } = await browseShareApi(shareUrl, scode)
   if (data.success === true) {
     shareInfo.value = data.data
-    fileTable.value = [...data.data.shareFolders, ...data.data.shareFiles]
+    fileList.value = [...data.data.shareFolders, ...data.data.shareFiles]
     pageNo.value = 1
   } else {
     if (data.code === 3003) {
@@ -154,17 +177,37 @@ async function submitCode() {
     }
   }
 }
+
+// 返回被分享文件最外层页面
+const goToAllSharedFile = async () => {
+  const { data } = await browseShareApi(shareUrl, code.value)
+  if (data.success === true) {
+    shareInfo.value = data.data
+    fileList.value = [...data.data.shareFolders, ...data.data.shareFiles]
+    pageNo.value = 1
+    breadcrumbStore.clearBreadcrumb()
+  }
+}
+
+// 点击面包屑返回对应的文件夹列表
+const goToSharedFile = async (id: string) => {
+  const { data } = await getSharedFolderApi(Number(id))
+  if (data.success === true) {
+    fileList.value = [...data.data.folders, ...data.data.files]
+    breadcrumbStore.deleteBreadcrumb(id)
+  }
+}
 </script>
 
 <template>
   <div class="layout">
     <el-container style="height: 100%">
       <el-header class="layout-header">
-        <div class="cloud-drive-name">
+        <div class="cloud-drive-name" @click="router.push('/')">
           <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
-          <span>简存取云盘</span>
+          <span style="cursor: pointer">简存取云盘</span>
         </div>
-        <div class="user-info">
+        <div class="user-info" v-if="!!user">
           <el-dropdown>
             <div style="display: flex; align-items: center; height: 50px">
               <el-avatar :size="45" :src="user.avatar" v-if="!!user" />
@@ -173,10 +216,9 @@ async function submitCode() {
                 src="https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132"
                 v-else
               />
-
               <div class="user-info-right-wrap">
                 <span class="user-name" v-if="!!user">{{ user.username }}</span>
-                <span class="user-name" v-else></span>
+                <span class="user-name" v-else>用户</span>
                 <el-progress :percentage="usage / 10.24" color="#0d53ff" :show-text="false" />
                 <span class="user-space"
                   ><span>{{ usage }}</span
@@ -202,11 +244,20 @@ async function submitCode() {
             </template>
           </el-dropdown>
         </div>
+        <div v-else style="margin: 0 10px 0 auto">
+          <el-button type="primary" style="padding: 0 20px" @click="router.push('/login')">
+            登录
+          </el-button>
+          <el-button type="primary" style="padding: 0 20px" @click="router.push('/register')">
+            注册
+          </el-button>
+        </div>
       </el-header>
       <el-container>
         <el-main class="layout-main">
           <div class="layout-main-container">
-            <div v-if="pageNo === 2" style="position: absolute; top: 40%; left: 30%">
+            <!-- 输入提取码 -->
+            <div v-if="pageNo === 2" style="position: absolute; top: 42%; left: 38%">
               <el-input
                 v-model="code"
                 size="large"
@@ -225,14 +276,51 @@ async function submitCode() {
                 </div>
               </el-button>
             </div>
+            <!-- 分享文件列表展示 -->
             <div v-else-if="pageNo === 1">
-              <div>
-                分享时间：{{ shareInfo.createTime }} -
-                {{ shareInfo.expireTime ? shareInfo.expireTime : '无限期 ' }} 共分享
-                {{ shareInfo.shareFolderCount + shareInfo.shareFileCount }} 个文件<br />
-                分享人：{{ shareInfo.shareUser.username }}
+              <div
+                style="margin: 12px 0 0 13px; padding: 0 0 20px 0; border-bottom: 1px solid #f6f6f6"
+              >
+                <div style="color: #0d53ff; font-size: 18px">
+                  {{ shareInfo.shareUser.username }}的分享：{{ shareInfo.description }}
+                </div>
+                <div style="font-size: 14px; margin: 15px 0 0 0">
+                  <span style="color: #909399">
+                    <el-icon :size="12"><Clock /></el-icon>
+                    分享时间: {{ shareInfo.createTime }}
+                  </span>
+                  <span style="color: #f56c6c; margin-left: 15px">
+                    <el-icon :size="12"><Clock /></el-icon>
+                    失效时间: {{ shareInfo.expireTime ? shareInfo.expireTime : '无限期 ' }}
+                  </span>
+                </div>
               </div>
-              <Table :fileShareList="fileTable" />
+              <div class="file-list">
+                <div>
+                  <div v-if="breadCrumbs.length === 0" class="file-list-breadcrumb">
+                    <span>全部文件</span>
+                    <span style="margin: 1px 0 0 5px">{{ fileTable.length }}</span>
+                  </div>
+                  <div v-else class="file-list-breadcrumb">
+                    <span class="all-files" @click="goToAllSharedFile">全部文件</span>
+                    <el-breadcrumb :separator-icon="ArrowRight" class="breadcrumb-container">
+                      <el-breadcrumb-item v-for="(breadCrumb, index) in breadCrumbs" :key="index">
+                        <a class="breadcrumb-item-a" @click="goToSharedFile(breadCrumb.id)">
+                          {{ breadCrumb.name }}
+                        </a>
+                      </el-breadcrumb-item>
+                    </el-breadcrumb>
+                  </div>
+                </div>
+              </div>
+              <Table
+                showType="share"
+                :table-height="tableHeight"
+                :share-info="{
+                  shareUrl,
+                  code
+                }"
+              />
             </div>
             <div v-else-if="pageNo === 4">
               <el-result icon="error" title="发生错误">
@@ -269,6 +357,7 @@ async function submitCode() {
     padding-left: 25px;
     font-size: 24px;
     font-weight: 600;
+    cursor: pointer;
   }
   .user-info {
     height: 50px;
@@ -337,6 +426,35 @@ async function submitCode() {
     background-color: #fff;
     border-top-right-radius: 24px;
     border-top-left-radius: 24px;
+  }
+}
+
+.file-list {
+  margin-left: 18px;
+  .file-list-breadcrumb {
+    height: 60px;
+    line-height: 60px;
+    font-size: 18px;
+    color: #999;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+  .all-files {
+    &:hover {
+      color: #0d53ff;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+  .breadcrumb-container {
+    display: inline-block;
+    padding: 2px 0 0 10px;
+  }
+  .breadcrumb-item-a {
+    &:hover {
+      color: #0d53ff;
+    }
   }
 }
 </style>

@@ -6,7 +6,7 @@ import { convertSize } from '@/utils/index'
 import server from '@/utils/axios'
 
 defineProps(['fileShareList'])
-const tableHeight = ref(window.innerHeight - 200)
+const tableHeight = ref(window.innerHeight * 0.65)
 
 // 鼠标悬浮至文件时展示文件相关操作
 const showOperation = (row: any, column: any, cell: HTMLElement, event: any) => {
