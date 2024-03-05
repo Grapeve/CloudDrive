@@ -24,6 +24,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.provide('baseFront', 'http://localhost:5173/#')
+app.provide('baseFront', window.location.origin)
 
 app.mount('#app')
