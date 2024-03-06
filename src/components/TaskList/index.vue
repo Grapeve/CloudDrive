@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Download } from '@element-plus/icons-vue'
+import { Upload } from '@element-plus/icons-vue'
 
 import { useUploadTaskStore } from '@/stores/uploadTask'
 
@@ -19,7 +19,7 @@ const { uploadTask, viewFlag } = storeToRefs(uploadTaskStore)
       v-model:visible="viewFlag"
     >
       <template #reference>
-        <el-button type="primary" :icon="Download" style="width: 55px; margin-right: 25px" />
+        <el-button type="primary" :icon="Upload" style="width: 55px; margin-right: 25px" />
       </template>
       <div>
         <el-table :data="uploadTask" empty-text="暂无传输任务" max-height="100px">

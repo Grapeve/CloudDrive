@@ -149,7 +149,7 @@ const uploadSliceFile = (fileChunks: Blob[], parentId: number) => {
           })
           uploadTask.value = new Array()
           const { data } = await getFolderApi(parentId)
-          fileList.value = [...data.data.files, ...data.data.folders]
+          fileList.value = [...data.data.folders, ...data.data.files]
         } else {
           uploadTask.value[0].statu = 0
           ElMessage({
