@@ -42,7 +42,7 @@ export const downloadFile = (file: fileType | folderType) => {
     }).then(() => {
       ElMessage({
         type: 'success',
-        message: '下载中，请误关闭浏览器！'
+        message: '下载中，请勿关闭浏览器！'
       })
       // const { data } = await downloadFolderApi(fileList.value[index].id)
       downloadFolderApi(file.id).then((res) => {
@@ -57,7 +57,7 @@ export const downloadFile = (file: fileType | folderType) => {
     }).then(async () => {
       ElMessage({
         type: 'success',
-        message: '下载中，请误关闭浏览器！'
+        message: '下载中，请勿关闭浏览器！'
       })
       const { data } = await downloadFileApi((file as fileType).object_key)
       browserDownload(data, file.name)
