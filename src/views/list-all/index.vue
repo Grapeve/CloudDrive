@@ -190,16 +190,16 @@ onMounted(() => {
     </el-button>
     <!-- 多选操作 -->
     <div class="multiple-selection-area" v-if="multipleSelection.length > 0">
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>下载</span>
         </div>
-      </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      </el-button> -->
+      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>分享</span>
         </div>
-      </el-button>
+      </el-button> -->
       <el-button
         type="primary"
         color="#ffffff"
@@ -220,11 +220,11 @@ onMounted(() => {
           <span>删除</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>移动到</span>
         </div>
-      </el-button>
+      </el-button> -->
     </div>
   </div>
   <div class="file-list">
@@ -267,8 +267,9 @@ onMounted(() => {
 
   .multiple-selection-area {
     margin-left: auto;
+    margin-right: 50px;
     :deep(.el-button) {
-      margin-left: 0;
+      margin-left: 10px;
     }
   }
 }
