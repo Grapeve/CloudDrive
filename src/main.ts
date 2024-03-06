@@ -27,7 +27,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 if (process.env.NODE_ENV === 'development') {
   app.provide('baseFront', window.location.origin + '/#')
 } else {
-  app.provide('baseFront', window.location.origin + '/pan/#/')
+  app.provide('baseFront', window.location.origin + '/pan/#')
 }
 
 app.mount('#app')
