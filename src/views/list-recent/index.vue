@@ -82,17 +82,17 @@ onBeforeMount(async () => {
     <UploadButton style="margin-right: 15px" />
     <!-- 多选操作 -->
     <div class="multiple-selection-area" v-if="multipleSelection.length > 0">
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>下载</span>
         </div>
-      </el-button>
+      </el-button> -->
       <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>分享</span>
         </div>
       </el-button>
-      <el-button
+      <!-- <el-button
         type="primary"
         color="#ffffff"
         class="btn-custom btn-folder"
@@ -101,27 +101,22 @@ onBeforeMount(async () => {
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>重命名</span>
         </div>
-      </el-button>
-      <el-button
-        type="primary"
-        color="#ffffff"
-        class="btn-custom btn-folder"
-        @click="multipleSelectionDelete"
-      >
+      </el-button> -->
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="multipleSelectionDelete">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>删除</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>移动到</span>
         </div>
-      </el-button>
+      </el-button> -->
     </div>
   </div>
   <div class="file-list">
     <!-- 文件列表 -->
-    <!-- <SortTable ref="fileTableRef" /> -->
+    <!-- <SortTable ref="fileTableRef" type="docx" /> -->
     <FileTable ref="fileTableRef" :table-height="tableHeight" />
   </div>
 </template>
@@ -146,9 +141,10 @@ onBeforeMount(async () => {
 
   .multiple-selection-area {
     margin-left: auto;
+    margin-right: 50px;
 
     :deep(.el-button) {
-      margin-left: 0;
+      margin-left: 10px;
     }
   }
 }

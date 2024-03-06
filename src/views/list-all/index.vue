@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, onMounted } from 'vue'
+import { ref, onBeforeMount, onMounted, watch} from 'vue'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -171,6 +171,85 @@ onMounted(() => {
       console.error('发生错误:', error)
     })
 })
+
+// 批量分享
+const shareVisible = ref(false)
+const isProtected = ref(false)
+const unlimitedDate = ref(false)
+const shareInfo = ref({
+  fileIds: [-1],
+  folderIds: [-1],
+  shareCode: null,
+  expireTime: '',
+  description: ''
+})
+
+watch(unlimitedDate, (newData) => {
+  if (newData === true) {
+    shareInfo.value.expireTime = ''
+  }
+})
+
+function shareStart() {
+  let folderIds: number[] = []
+  let fileIds: number[] = []
+  multipleSelection.value.forEach((item) => {
+    if (item.type === 'folder') {
+      folderIds.push(item.id)
+    } else {
+      fileIds.push(item.id)
+    }
+  })
+    shareInfo.value.folderIds = folderIds
+    shareInfo.value.fileIds = fileIds
+  isProtected.value = false
+  shareVisible.value = true
+}
+
+function shareConfirm() {
+  // console.log(shareInfo.value)
+  if (!isProtected.value) {
+    shareInfo.value.shareCode = null
+  }
+  server
+    .post('/share/addShare', shareInfo.value)
+    .then((res) => {
+      if (res.data.success) {
+        const codeShow = isProtected.value ? res.data.data.shareCode : '无需提取码'
+        const timeShow = !unlimitedDate.value ? res.data.data.expireTime : '无限期'
+
+        shareVisible.value = false
+        isProtected.value = false
+        unlimitedDate.value = false
+        fileTableRef?.value?.clearMultipleSelection()
+        ElMessageBox.alert(
+          '分享链接：' +
+          baseFront +
+          '/openShareLink?link=' +
+          res.data.data.shareUrl +
+          '<br>提取码：' +
+          codeShow +
+          '<br>有效期至：' +
+          timeShow,
+          '分享成功！',
+          {
+            confirmButtonText: '返回',
+            dangerouslyUseHTMLString: true
+          }
+        )
+      } else {
+        ElNotification({
+          title: '分享失败！',
+          message: res.data.msg,
+          type: 'error'
+        })
+      }
+    })
+    .catch((error) => {
+      // 处理错误
+      console.error('发生错误:', error)
+    })
+}
 </script>
 
 <template>
@@ -197,11 +276,11 @@ onMounted(() => {
           <span>下载</span>
         </div>
       </el-button> -->
-      <!-- <el-button type="primary" color="#ffffff" class="btn-custom btn-folder">
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="shareStart()">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>分享</span>
         </div>
-      </el-button> -->
+      </el-button>
       <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" v-if="multipleSelection.length === 1">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>重命名</span>
@@ -238,6 +317,29 @@ onMounted(() => {
     </div>
     <!-- 文件列表 -->
     <FileTable ref="fileTableRef" />
+    <!-- 分享Dialog -->
+    <el-dialog v-model="shareVisible" title="分享文件" width="500">
+      <el-form :model="shareInfo" label-width="100px">
+        <el-form-item label="分享描述">
+          <el-input v-model="shareInfo.description" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="分享有效期">
+          <el-date-picker v-model="shareInfo.expireTime" type="datetime" placeholder="请选择日期"
+            format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" :disabled="unlimitedDate" />&nbsp;&nbsp;
+          <el-checkbox label="无限期" v-model="unlimitedDate"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="需要提取码">
+          <el-checkbox v-model="isProtected"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="提取码" v-show="isProtected">
+          <el-input v-model="shareInfo.shareCode" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer">
+        <el-button @click="shareVisible = false">取消</el-button>
+        <el-button type="primary" @click="shareConfirm"> 确认分享 </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
