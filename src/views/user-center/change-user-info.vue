@@ -1,5 +1,9 @@
 <template>
   <div class="changeinfo">
+    <div class="cloud-drive-name">
+      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+      <span>简存取云盘</span>
+    </div>
     <el-form :model="changeinfo" label-width="120px">
       <el-form-item label="用户名：" required>
         <el-input v-model="changeinfo.username" />
@@ -110,4 +114,23 @@ function sendCode() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.changeinfo {
+  width: 50vh;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  /* 垂直布局 */
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.cloud-drive-name {
+  margin-bottom: 20px;
+  /* 留出一些空间 */
+  padding-left: 80px;
+  font-size: 24px;
+  font-weight: 600;
+}
+</style>

@@ -41,6 +41,10 @@ function loginSubmit() {
 
 <template>
   <div class="login">
+    <div class="cloud-drive-name">
+      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+      <span>简存取云盘</span>
+    </div>
     <el-form :model="loginForm" label-width="120px">
       <el-form-item label="用户名：">
         <el-input v-model="loginForm.username" />
@@ -63,9 +67,18 @@ function loginSubmit() {
   width: 50vh;
   height: 50vh;
   display: flex;
+  flex-direction: column;
+  /* 垂直布局 */
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  padding: 0 140px 0 0;
+}
+
+.cloud-drive-name {
+  margin-bottom: 20px;
+  /* 留出一些空间 */
+  padding-left: 80px;
+  font-size: 24px;
+  font-weight: 600;
 }
 </style>

@@ -1,13 +1,17 @@
 <template>
   <div class="changepwd">
-    <el-form :model="changepwd" label-width="120px">
+    <div class="cloud-drive-name">
+      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+      <span>简存取云盘</span>
+    </div>
+    <el-form :model="changepwd" label-width="180px">
       <el-form-item label="原密码：" required>
         <el-input v-model="changepwd.oldPassword" show-password />
       </el-form-item>
-      <el-form-item label="新密码：">
+      <el-form-item label="新密码：" required>
         <el-input v-model="changepwd.newPassword" show-password />
       </el-form-item>
-      <el-form-item label="再次输入新密码：">
+      <el-form-item label="再次输入新密码：" required>
         <el-input v-model="renew" show-password />
       </el-form-item>
       <el-form-item>
@@ -64,4 +68,23 @@ function changeSubmit() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.changepwd {
+  width: 50vh;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  /* 垂直布局 */
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.cloud-drive-name {
+  margin-bottom: 20px;
+  /* 留出一些空间 */
+  padding-left: 80px;
+  font-size: 24px;
+  font-weight: 600;
+}
+</style>
