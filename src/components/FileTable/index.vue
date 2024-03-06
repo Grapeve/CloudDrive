@@ -44,7 +44,7 @@ const props = defineProps({
     required: false,
     default: window.innerHeight * 0.71
   },
-  shareInfo: {
+  showInfo: {
     type: Object as PropType<ShareInfo>,
     required: false
   }

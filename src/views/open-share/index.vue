@@ -316,7 +316,7 @@ const goToSharedFile = async (id: string) => {
               <Table
                 showType="share"
                 :table-height="tableHeight"
-                :share-info="{
+                :show-info="{
                   shareUrl,
                   code
                 }"
