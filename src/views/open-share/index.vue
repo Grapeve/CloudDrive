@@ -231,9 +231,9 @@ const goToSharedFile = async (id: string) => {
                 <el-dropdown-item>
                   <div @click="changeInfo">修改个人信息</div>
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <!-- <el-dropdown-item>
                   <div @click="updateAvatar">更新头像</div>
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item>
                   <div @click="changePwd">修改密码</div>
                 </el-dropdown-item>

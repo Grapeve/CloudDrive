@@ -102,7 +102,12 @@ onBeforeMount(async () => {
           <span>重命名</span>
         </div>
       </el-button> -->
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="multipleSelectionDelete">
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        @click="multipleSelectionDelete"
+      >
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>删除</span>
         </div>

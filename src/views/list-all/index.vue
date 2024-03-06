@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, onMounted, watch} from 'vue'
+import { ref, onBeforeMount, onMounted, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -200,8 +200,8 @@ function shareStart() {
       fileIds.push(item.id)
     }
   })
-    shareInfo.value.folderIds = folderIds
-    shareInfo.value.fileIds = fileIds
+  shareInfo.value.folderIds = folderIds
+  shareInfo.value.fileIds = fileIds
   isProtected.value = false
   shareVisible.value = true
 }
@@ -224,13 +224,13 @@ function shareConfirm() {
         fileTableRef?.value?.clearMultipleSelection()
         ElMessageBox.alert(
           '分享链接：' +
-          baseFront +
-          '/openShareLink?link=' +
-          res.data.data.shareUrl +
-          '<br>提取码：' +
-          codeShow +
-          '<br>有效期至：' +
-          timeShow,
+            baseFront +
+            '/openShareLink?link=' +
+            res.data.data.shareUrl +
+            '<br>提取码：' +
+            codeShow +
+            '<br>有效期至：' +
+            timeShow,
           '分享成功！',
           {
             confirmButtonText: '返回',
@@ -281,12 +281,22 @@ function shareConfirm() {
           <span>分享</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" v-if="multipleSelection.length === 1">
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        v-if="multipleSelection.length === 1"
+      >
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>重命名</span>
         </div>
       </el-button>
-      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="multipleSelectionDelete">
+      <el-button
+        type="primary"
+        color="#ffffff"
+        class="btn-custom btn-folder"
+        @click="multipleSelectionDelete"
+      >
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>删除</span>
         </div>
@@ -310,7 +320,7 @@ function shareConfirm() {
           <el-breadcrumb-item v-for="(breadCrumb, index) in breadCrumbs" :key="index">
             <a class="breadcrumb-item-a" @click="goToThis(breadCrumb.id)" href="#/all">{{
               breadCrumb.name
-              }}</a>
+            }}</a>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </div>
@@ -324,8 +334,14 @@ function shareConfirm() {
           <el-input v-model="shareInfo.description" autocomplete="off" />
         </el-form-item>
         <el-form-item label="分享有效期">
-          <el-date-picker v-model="shareInfo.expireTime" type="datetime" placeholder="请选择日期"
-            format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" :disabled="unlimitedDate" />&nbsp;&nbsp;
+          <el-date-picker
+            v-model="shareInfo.expireTime"
+            type="datetime"
+            placeholder="请选择日期"
+            format="YYYY/MM/DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :disabled="unlimitedDate"
+          />&nbsp;&nbsp;
           <el-checkbox label="无限期" v-model="unlimitedDate"></el-checkbox>
         </el-form-item>
         <el-form-item label="需要提取码">

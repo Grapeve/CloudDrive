@@ -144,14 +144,14 @@ onBeforeMount(async () => {
     border: 1px solid #ddd;
   }
 
-    .multiple-selection-area {
-      margin-left: auto;
-      margin-right: 50px;
-  
-      :deep(.el-button) {
-        margin-left: 10px;
-      }
+  .multiple-selection-area {
+    margin-left: auto;
+    margin-right: 50px;
+
+    :deep(.el-button) {
+      margin-left: 10px;
     }
+  }
 }
 
 .file-list {
