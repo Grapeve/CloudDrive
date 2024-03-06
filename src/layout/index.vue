@@ -2,7 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElNotification } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Download } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 
 import server from '@/utils/axios'
@@ -10,6 +10,7 @@ import { useBreadcrumbStore } from '@/stores/breadcrumb'
 import { localGet, localRemove } from '@/utils/localStorageFn'
 import { useFileStore } from '@/stores/file'
 import { searchFileOrFolders } from '@/api/fileApi'
+import TaskList from '@/components/TaskList/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -117,6 +118,7 @@ watch(
           <span>简存取云盘</span>
         </div>
         <div class="right-content">
+          <TaskList />
           <div class="serach-area">
             <el-input
               v-model="searchInput"
@@ -315,5 +317,8 @@ watch(
     border-top-right-radius: 24px;
     border-top-left-radius: 24px;
   }
+}
+.upload-task-content {
+  background-color: red;
 }
 </style>

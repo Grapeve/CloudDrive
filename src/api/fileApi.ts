@@ -102,6 +102,27 @@ export const retrieveFileApi = (idList: Number[]) => {
 
 // 批量从回收站取回文件夹
 export const retrieveFolderApi = (idList: Number[]) => {
-  console.log(idList)
   return axios.post('/folder/retrieveFolder', { folderIds: idList })
+}
+
+// 分片上传
+export const initiateMultipartUploadApi = (filename: string) => {
+  return axios.post(`/file/initiateMultipartUpload?filename=${filename}`)
+}
+
+export const uploadPart = (key: string, uploadId: string, chunkNum: number, file: FormData) => {
+  return axios.post(`/file/uploadPart?key=${key}&uploadId=${uploadId}&chunkNum=${chunkNum}`, file, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+export const completeMultipartUploadApi = (
+  key: string,
+  uploadId: string,
+  partETagDTOs: any[],
+  uploadFileDTO: object
+) => {
+  return axios.post('/file/completeMultipartUpload', { key, uploadId, partETagDTOs, uploadFileDTO })
 }

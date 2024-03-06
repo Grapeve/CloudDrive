@@ -3,7 +3,7 @@ import { localGet, localRemove } from './localStorageFn'
 import router from '@/router/index'
 
 const server = axios.create({
-  baseURL: 'http://120.79.155.59:9096',
+  baseURL: 'http://114.132.210.33:9096',
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
     token: localGet('token') || ''

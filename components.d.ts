@@ -28,6 +28,7 @@ declare module 'vue' {
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
+    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElProgress: typeof import('element-plus/es')['ElProgress']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
@@ -44,6 +45,7 @@ declare module 'vue' {
     ShareTable: typeof import('./src/components/shareTable/index.vue')['default']
     SortTable: typeof import('./src/components/SortTable/index.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/index.vue')['default']
+    TaskList: typeof import('./src/components/TaskList/index.vue')['default']
     UploadButton: typeof import('./src/components/UploadButton/index.vue')['default']
   }
 }
