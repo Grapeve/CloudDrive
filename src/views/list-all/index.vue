@@ -184,7 +184,9 @@ onMounted(() => {
     <UploadButton style="margin-right: 15px" />
     <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="createFolder">
       <div style="display: flex; align-items: center; font-weight: 700">
-        <el-icon size="14"><Folder /></el-icon>
+        <el-icon size="14">
+          <Folder />
+        </el-icon>
         <span>新建文件夹</span>
       </div>
     </el-button>
@@ -200,22 +202,12 @@ onMounted(() => {
           <span>分享</span>
         </div>
       </el-button> -->
-      <el-button
-        type="primary"
-        color="#ffffff"
-        class="btn-custom btn-folder"
-        v-if="multipleSelection.length === 1"
-      >
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" v-if="multipleSelection.length === 1">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>重命名</span>
         </div>
       </el-button>
-      <el-button
-        type="primary"
-        color="#ffffff"
-        class="btn-custom btn-folder"
-        @click="multipleSelectionDelete"
-      >
+      <el-button type="primary" color="#ffffff" class="btn-custom btn-folder" @click="multipleSelectionDelete">
         <div style="display: flex; align-items: center; font-weight: 700">
           <span>删除</span>
         </div>
@@ -239,7 +231,7 @@ onMounted(() => {
           <el-breadcrumb-item v-for="(breadCrumb, index) in breadCrumbs" :key="index">
             <a class="breadcrumb-item-a" @click="goToThis(breadCrumb.id)" href="#/all">{{
               breadCrumb.name
-            }}</a>
+              }}</a>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </div>
