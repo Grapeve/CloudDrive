@@ -50,19 +50,24 @@ const props = defineProps({
   }
 })
 
+const preViewVis = ref(false)
+const preViewUrl = ref('')
+const preViewType = ref('')
 // 进入文件夹
 const goToFolder = async (file: any) => {
   // 分享页面浏览文件夹
   if (props.showType === 'share') {
-    const { data } = await getSharedFolderApi(file.id)
-    if (data.success === true) {
-      breadcrumbStore.addBreadcrumb({
-        id: file.id,
-        name: file.name
-      })
-      fileList.value = [...data.data.folders, ...data.data.files]
+    if (file.type==='folder'){
+      const { data } = await getSharedFolderApi(file.id)
+      if (data.success === true) {
+        breadcrumbStore.addBreadcrumb({
+          id: file.id,
+          name: file.name
+        })
+        fileList.value = [...data.data.folders, ...data.data.files]
+      }
+      return
     }
-    return
   }
   if (file.type === 'folder') {
     const { data } = await getFolderApi(file.id, '')
@@ -79,6 +84,21 @@ const goToFolder = async (file: any) => {
         message: data.msg
       })
     }
+  }
+  else if (file.mime_type?.includes('image')){
+    preViewUrl.value = file.url
+    preViewType.value = 'image'
+    preViewVis.value = true
+  }
+  else if (file.mime_type?.includes('video')) {
+    preViewUrl.value = file.url
+    preViewType.value = 'video'
+    preViewVis.value = true
+  }
+  else if (file.mime_type?.includes('audio')) {
+    preViewUrl.value = file.url
+    preViewType.value = 'audio'
+    preViewVis.value = true
   }
 }
 
@@ -441,97 +461,42 @@ defineExpose({
 
 <template>
   <!-- 文件列表 -->
-  <el-table
-    :data="fileList"
-    ref="fileTableRef"
-    style="width: 100%"
-    :height="props.tableHeight"
-    @cell-mouse-enter="showOperation"
-    @cell-mouse-leave="hiddenOperation"
-    @selection-change="handleSelectionChange"
-  >
+  <el-table :data="fileList" ref="fileTableRef" style="width: 100%" :height="props.tableHeight"
+    @cell-mouse-enter="showOperation" @cell-mouse-leave="hiddenOperation" @selection-change="handleSelectionChange">
     <el-table-column type="selection" width="35" />
     <el-table-column prop="name" label="文件名" min-width="780" class="file-show">
       <template #default="scope">
         <div style="display: flex; align-items: center">
-          <img
-            src="/src/assets/imgs/folder.png"
-            width="32"
-            height="32"
-            v-if="scope.row.type === 'folder'"
-          />
-          <img
-            src="/src/assets/imgs/docx.png"
-            width="32"
-            height="32"
-            v-else-if="
+          <img src="/src/assets/imgs/folder.png" width="32" height="32" v-if="scope.row.type === 'folder'" />
+          <img src="/src/assets/imgs/docx.png" width="32" height="32" v-else-if="
               scope.row.mime_type?.includes(
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
               )
-            "
-          />
-          <el-image
-            :src="scope.row.url"
-            style="width: 32px; height: 32px"
-            v-else-if="scope.row.mime_type?.includes('image')"
-          />
-          <img
-            src="/src/assets/imgs/pdf.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('pdf')"
-          />
-          <img
-            src="/src/assets/imgs/ppt.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('powerpoint')"
-          />
-          <img
-            src="/src/assets/imgs/music.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('audio')"
-          />
-          <img
-            src="/src/assets/imgs/video.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('video')"
-          />
-          <img
-            src="/src/assets/imgs/excel.png"
-            width="32"
-            height="32"
-            v-else-if="
+            " />
+          <el-image :src="scope.row.url" style="width: 32px; height: 32px"
+            v-else-if="scope.row.mime_type?.includes('image')" />
+          <img src="/src/assets/imgs/pdf.png" width="32" height="32" v-else-if="scope.row.mime_type?.includes('pdf')" />
+          <img src="/src/assets/imgs/ppt.png" width="32" height="32"
+            v-else-if="scope.row.mime_type?.includes('powerpoint')" />
+          <img src="/src/assets/imgs/music.png" width="32" height="32"
+            v-else-if="scope.row.mime_type?.includes('audio')" />
+          <img src="/src/assets/imgs/video.png" width="32" height="32"
+            v-else-if="scope.row.mime_type?.includes('video')" />
+          <img src="/src/assets/imgs/excel.png" width="32" height="32" v-else-if="
               scope.row.mime_type?.includes(
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               )
-            "
-          />
-          <img
-            src="/src/assets/imgs/txt.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('text/plain')"
-          />
-          <img
-            src="/src/assets/imgs/zip.png"
-            width="32"
-            height="32"
-            v-else-if="scope.row.mime_type?.includes('application/x-zip-compressed')"
-          />
+            " />
+          <img src="/src/assets/imgs/txt.png" width="32" height="32"
+            v-else-if="scope.row.mime_type?.includes('text/plain')" />
+          <img src="/src/assets/imgs/zip.png" width="32" height="32"
+            v-else-if="scope.row.mime_type?.includes('application/x-zip-compressed')" />
           <img src="/src/assets/imgs/unknown.png" width="32" height="32" v-else />
           <div style="margin-left: 10px; cursor: pointer">
-            <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)"
-              >{{ scope.row.name }}
+            <span v-if="scope.$index !== renameNo" @click="goToFolder(scope.row)">{{ scope.row.name }}
             </span>
-            <el-input
-              v-else
-              v-model="fileRenameName"
-              @blur="renameFolderNameFn"
-              @keyup.enter.native="$event.target.blur()"
-            ></el-input>
+            <el-input v-else v-model="fileRenameName" @blur="renameFolderNameFn"
+              @keyup.enter.native="$event.target.blur()"></el-input>
           </div>
         </div>
         <div class="file-operation-content">
@@ -590,22 +555,14 @@ defineExpose({
           </div>
           <div v-else-if="props.showType === 'share'">
             <el-tooltip content="下载" placement="top" effect="light">
-              <el-button
-                circle
-                color="#0d53ff"
-                @click="downloadSharedFile(fileList[scope.$index], props.showInfo!)"
-              >
+              <el-button circle color="#0d53ff" @click="downloadSharedFile(fileList[scope.$index], props.showInfo!)">
                 <el-icon :size="18">
                   <Download />
                 </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip content="保存到网盘" placement="top" effect="light">
-              <el-button
-                circle
-                color="#bb0fff"
-                @click="saveToMine(fileList[scope.$index], props.showInfo!)"
-              >
+              <el-button circle color="#bb0fff" @click="saveToMine(fileList[scope.$index], props.showInfo!)">
                 <el-icon :size="18">
                   <PartlyCloudy />
                 </el-icon>
@@ -622,12 +579,7 @@ defineExpose({
         <span v-else>{{ convertSize(scope1.row.size) }}</span>
       </template>
     </el-table-column>
-    <el-table-column
-      prop="delete_time"
-      label="删除日期"
-      min-width="200"
-      v-if="props.showType === 'recycle'"
-    />
+    <el-table-column prop="delete_time" label="删除日期" min-width="200" v-if="props.showType === 'recycle'" />
     <el-table-column prop="update_time" label="修改日期" min-width="200" v-else />
   </el-table>
   <!-- 分享Dialog -->
@@ -637,14 +589,8 @@ defineExpose({
         <el-input v-model="shareInfo.description" autocomplete="off" />
       </el-form-item>
       <el-form-item label="分享有效期">
-        <el-date-picker
-          v-model="shareInfo.expireTime"
-          type="datetime"
-          placeholder="请选择日期"
-          format="YYYY/MM/DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
-          :disabled="unlimitedDate"
-        />&nbsp;&nbsp;
+        <el-date-picker v-model="shareInfo.expireTime" type="datetime" placeholder="请选择日期" format="YYYY/MM/DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss" :disabled="unlimitedDate" />&nbsp;&nbsp;
         <el-checkbox label="无限期" v-model="unlimitedDate"></el-checkbox>
       </el-form-item>
       <el-form-item label="需要提取码">
@@ -662,14 +608,8 @@ defineExpose({
   <!-- 移动Dialog -->
   <el-dialog title="移动到" v-model="moveVisible" width="600">
     <div class="tree-dialog-area">
-      <el-tree
-        :data="treeData"
-        :props="treeProps"
-        node-key="id"
-        :default-expanded-keys="[1]"
-        :expand-on-click-node="false"
-        ref="treeRef"
-      >
+      <el-tree :data="treeData" :props="treeProps" node-key="id" :default-expanded-keys="[1]"
+        :expand-on-click-node="false" ref="treeRef">
         <template #default="{ node, data }">
           <div class="treeNode-area">
             <img src="/src/assets/imgs/folder.png" width="28" height="28" />
@@ -684,6 +624,17 @@ defineExpose({
         <el-button type="primary" @click="doChoseTreeNodeCallBack">移动</el-button>
       </div>
     </template>
+  </el-dialog>
+  <!-- 文件预览 -->
+  <el-dialog v-model="preViewVis" top="8vh">
+    <div style="display: flex;text-align: center;">
+      <img :src="preViewUrl" style="max-width: 83vh;max-height: 90vh;" v-if="preViewType==='image'" />
+      <video controls style="max-width: 83vh;max-height: 90vh;" v-if="preViewType === 'video'">
+        <source :src="preViewUrl" type="video/mp4" />
+      </video>
+      <audio :src="preViewUrl" style="max-width: 83vh;max-height: 90vh;" controls autoplay
+        v-if="preViewType === 'audio'" />
+    </div>
   </el-dialog>
 </template>
 
