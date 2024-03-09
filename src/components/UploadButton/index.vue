@@ -62,6 +62,7 @@ const uploadFile = async () => {
   }
   const chunks = createFileChunk(uploadFileList.value)
   uploadSliceFile(chunks!, parentId)
+  uploadFileList.value = new Array()
   // 拿到了文件对象存储到uploadFileList中
   // const uploadFormData = new FormData()
   // uploadFileList.value.forEach((file) => {
