@@ -502,7 +502,7 @@ defineExpose({
             src="/src/assets/imgs/ppt.png"
             width="32"
             height="32"
-            v-else-if="scope.row.mime_type?.includes('powerpoint')"
+            v-else-if="scope.row.mime_type?.includes('presentationml.presentation')"
           />
           <img
             src="/src/assets/imgs/music.png"
