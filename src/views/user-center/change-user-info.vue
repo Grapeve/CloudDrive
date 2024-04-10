@@ -1,36 +1,49 @@
 <template>
   <div class="changeinfo">
-    <div class="cloud-drive-name">
-      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
-      <span>简存取云盘</span>
+    <div class="changeInfo-container">
+      <div class="cloud-drive-name" @click="router.push('/')">
+        <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+        <span>简存取云盘</span>
+      </div>
+      <el-form :model="changeinfo" label-width="120px">
+        <el-form-item label="用户名：" required>
+          <el-input v-model="changeinfo.username" />
+        </el-form-item>
+        <el-form-item label="性别：">
+          <el-radio-group v-model="changeinfo.gender">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="0">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="手机号码：" required>
+          <el-input v-model="changeinfo.phone" />
+        </el-form-item>
+        <el-form-item label="邮箱：" required>
+          <el-input v-model="changeinfo.email">
+            <template #append>
+              <el-button @click="sendCode">发送验证码</el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="验证码：" required>
+          <el-input v-model="changeinfo.code" />
+        </el-form-item>
+        <el-form-item>
+          <div style="display: flex; flex-direction: column">
+            <el-button type="primary" @click="changeSubmit" style="width: 240px">
+              确认修改
+            </el-button>
+            <el-button
+              type="primary"
+              @click="router.push('/')"
+              style="width: 240px; margin: 10px 0 0 0"
+            >
+              返回
+            </el-button>
+          </div>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-form :model="changeinfo" label-width="120px">
-      <el-form-item label="用户名：" required>
-        <el-input v-model="changeinfo.username" />
-      </el-form-item>
-      <el-form-item label="性别：">
-        <el-radio-group v-model="changeinfo.gender">
-          <el-radio :label="1">男</el-radio>
-          <el-radio :label="0">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="手机号码：" required>
-        <el-input v-model="changeinfo.phone" />
-      </el-form-item>
-      <el-form-item label="邮箱：" required>
-        <el-input v-model="changeinfo.email">
-          <template #append>
-            <el-button @click="sendCode">发送验证码</el-button>
-          </template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="验证码：" required>
-        <el-input v-model="changeinfo.code" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="changeSubmit">确认修改</el-button>
-      </el-form-item>
-    </el-form>
   </div>
 </template>
 
@@ -116,20 +129,27 @@ function sendCode() {
 
 <style scoped>
 .changeinfo {
-  width: 50vh;
+  width: 55vh;
   height: 80vh;
   display: flex;
-  flex-direction: column;
   /* 垂直布局 */
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  margin: 0px auto;
+}
+
+.changeInfo-container {
+  margin-right: 20px;
 }
 
 .cloud-drive-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
   margin-bottom: 20px;
   /* 留出一些空间 */
-  padding-left: 80px;
+  /* padding-left: 40px; */
   font-size: 24px;
   font-weight: 600;
 }

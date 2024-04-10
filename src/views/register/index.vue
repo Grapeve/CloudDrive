@@ -78,48 +78,50 @@ function sendCode() {
 
 <template>
   <div class="login">
-    <div class="cloud-drive-name">
-      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
-      <span>简存取云盘</span>
+    <div class="register-container">
+      <div class="cloud-drive-name">
+        <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+        <span>简存取云盘</span>
+      </div>
+      <el-form :model="regForm" label-width="120px">
+        <el-form-item label="用户名：" required>
+          <el-input v-model="regForm.username" />
+        </el-form-item>
+        <el-form-item label="密码：" required>
+          <el-input v-model="regForm.password" show-password />
+        </el-form-item>
+        <el-form-item label="确认密码：" required>
+          <el-input v-model="password_check" show-password />
+        </el-form-item>
+        <el-form-item label="性别：">
+          <el-radio-group v-model="regForm.gender">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="0">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="手机号码：" required>
+          <el-input v-model="regForm.phone" />
+        </el-form-item>
+        <el-form-item label="邮箱：" required>
+          <el-input v-model="regForm.email">
+            <template #append>
+              <el-button @click="sendCode">发送验证码</el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="验证码：" required>
+          <el-input v-model="regForm.code" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="regSubmit" style="width: 227px">注册</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="router.push('/login')" style="width: 227px">
+            返回登录
+          </el-button>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-form :model="regForm" label-width="120px">
-      <el-form-item label="用户名：" required>
-        <el-input v-model="regForm.username" />
-      </el-form-item>
-      <el-form-item label="密码：" required>
-        <el-input v-model="regForm.password" show-password />
-      </el-form-item>
-      <el-form-item label="确认密码：" required>
-        <el-input v-model="password_check" show-password />
-      </el-form-item>
-      <el-form-item label="性别：">
-        <el-radio-group v-model="regForm.gender">
-          <el-radio :label="1">男</el-radio>
-          <el-radio :label="0">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="手机号码：" required>
-        <el-input v-model="regForm.phone" />
-      </el-form-item>
-      <el-form-item label="邮箱：" required>
-        <el-input v-model="regForm.email">
-          <template #append>
-            <el-button @click="sendCode">发送验证码</el-button>
-          </template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="验证码：" required>
-        <el-input v-model="regForm.code" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="regSubmit" style="width: 227px">注册</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="router.push('/login')" style="width: 227px">
-          返回登录
-        </el-button>
-      </el-form-item>
-    </el-form>
   </div>
 </template>
 
@@ -135,10 +137,19 @@ function sendCode() {
   margin: 0 auto;
 }
 
+.register-container {
+  padding-top: 100px;
+  padding-right: 70px;
+}
+
 .cloud-drive-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   margin-bottom: 20px;
   /* 留出一些空间 */
-  padding-left: 80px;
+  /* padding-left: 80px; */
   font-size: 24px;
   font-weight: 600;
 }

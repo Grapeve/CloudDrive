@@ -1,23 +1,26 @@
 <template>
   <div class="changepwd">
-    <div class="cloud-drive-name">
-      <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
-      <span>简存取云盘</span>
+    <div class="changepwd-container">
+      <div class="cloud-drive-name">
+        <SvgIcon icon="pan" style="font-size: 50px"></SvgIcon>
+        <span>简存取云盘</span>
+      </div>
+      <el-form :model="changepwd" label-width="180px">
+        <el-form-item label="原密码：" required>
+          <el-input v-model="changepwd.oldPassword" show-password />
+        </el-form-item>
+        <el-form-item label="新密码：" required>
+          <el-input v-model="changepwd.newPassword" show-password />
+        </el-form-item>
+        <el-form-item label="再次输入新密码：" required>
+          <el-input v-model="renew" show-password />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="changeSubmit" style="width: 100px">登录</el-button>
+          <el-button type="primary" @click="router.push('/')" style="width: 100px">返回</el-button>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-form :model="changepwd" label-width="180px">
-      <el-form-item label="原密码：" required>
-        <el-input v-model="changepwd.oldPassword" show-password />
-      </el-form-item>
-      <el-form-item label="新密码：" required>
-        <el-input v-model="changepwd.newPassword" show-password />
-      </el-form-item>
-      <el-form-item label="再次输入新密码：" required>
-        <el-input v-model="renew" show-password />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="changeSubmit">登录</el-button>
-      </el-form-item>
-    </el-form>
   </div>
 </template>
 
@@ -70,8 +73,8 @@ function changeSubmit() {
 
 <style scoped>
 .changepwd {
-  width: 50vh;
-  height: 60vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   /* 垂直布局 */
@@ -80,8 +83,21 @@ function changeSubmit() {
   margin: 0 auto;
 }
 
+.changepwd-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  padding-bottom: 100px;
+  padding-right: 100px;
+}
+
 .cloud-drive-name {
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
   /* 留出一些空间 */
   padding-left: 80px;
   font-size: 24px;

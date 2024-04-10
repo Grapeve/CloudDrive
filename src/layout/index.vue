@@ -83,6 +83,7 @@ const searchInput = ref<string>('')
 const searchFile = async () => {
   const { data } = await searchFileOrFolders(-1, searchInput.value)
   if (data.success === true) {
+    breadcrumbStore.clearBreadcrumb()
     breadcrumbStore.addBreadcrumb({
       id: '-1',
       name: `搜索: ${searchInput.value}`

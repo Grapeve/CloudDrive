@@ -703,28 +703,13 @@ defineExpose({
     </template>
   </el-dialog>
   <!-- 文件预览 -->
-  <el-dialog v-model="preViewVis" top="8vh">
+  <el-dialog v-model="preViewVis" top="8vh" :width="1000" title="文件预览">
     <div style="display: flex; text-align: center">
-      <img
-        :src="preViewUrl"
-        style="max-width: 83vh; max-height: 90vh"
-        v-if="preViewType === 'image'"
-      />
-      <video
-        controls
-        autoplay
-        style="max-width: 83vh; max-height: 90vh"
-        v-if="preViewType === 'video'"
-      >
+      <img :src="preViewUrl" width="965" v-if="preViewType === 'image'" />
+      <video controls autoplay width="965" v-if="preViewType === 'video'">
         <source :src="preViewUrl" type="video/mp4" />
       </video>
-      <audio
-        :src="preViewUrl"
-        style="max-width: 83vh; max-height: 90vh"
-        controls
-        autoplay
-        v-if="preViewType === 'audio'"
-      />
+      <audio :src="preViewUrl" width="965" controls v-if="preViewType === 'audio'"></audio>
     </div>
   </el-dialog>
 </template>
